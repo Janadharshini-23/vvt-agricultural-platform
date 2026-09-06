@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Dashboard — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard" id="app">
+        <nav class="dashboard-nav">
+            <div class="logo"><span class="logo-icon">🌾</span><span class="logo-text">VVT</span></div>
+            <div class="nav-actions">
+                <div class="user-badge"><span>🏢</span><span id="buyerName">Kaveri Fresh Foods</span><span class="verified">✓</span></div>
+                <a href="login.html" class="btn-outline-sm" style="padding:6px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);text-decoration:none;color:var(--gray-600);font-size:14px;">Logout</a>
+            </div>
+        </nav>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header fade-in">
+                <h1><span class="greeting">Good morning,</span><span id="greetingName">Kaveri Fresh Foods</span></h1>
+                <p class="subtitle">Manage your agricultural procurement.</p>
+                <div style="margin-top:16px;">
+                    <a href="buyer-requirement.html" class="btn-primary" style="padding:12px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:var(--radius-sm);">
+                        + POST REQUIREMENT
+                    </a>
+                </div>
+            </header>
+
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">📋</div>
+                    <div class="metric-value" id="activeRequirements">0</div>
+                    <div class="metric-label">Active Requirements</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📦</div>
+                    <div class="metric-value" id="supplyMatched">0 <span class="currency">kg</span></div>
+                    <div class="metric-label">Supply Matched</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🏠</div>
+                    <div class="metric-value" id="farmCount">0</div>
+                    <div class="metric-label">Farms</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🚚</div>
+                    <div class="metric-value" id="activeDeliveries">0</div>
+                    <div class="metric-label">Active Deliveries</div>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>📋 Active Requirements</h2>
+                    <a href="buyer-requirement.html" class="view-all">+ New</a>
+                </div>
+                <div id="requirementsList">
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        ⏳ Loading requirements...
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>🌾 Supply Network</h2>
+                    <a href="buyer-supply-network.html" class="view-all">View Network →</a>
+                </div>
+                <div id="supplyNetwork">
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        ⏳ Loading supply network...
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>🚚 Active Deliveries</h2>
+                </div>
+                <div id="activeDelivery">
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        No active deliveries.
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <a href="buyer-dashboard.html" class="nav-item active"><span class="nav-icon">🏠</span>Home</a>
+                <a href="buyer-requirement.html" class="nav-item"><span class="nav-icon">📋</span>Requirements</a>
+                <a href="buyer-supply-network.html" class="nav-item"><span class="nav-icon">🌾</span>Supply</a>
+                <a href="buyer-orders.html" class="nav-item"><span class="nav-icon">📦</span>Orders</a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let buyerId = 1;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = sessionStorage.getItem('user');
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const userData = JSON.parse(user);
+            if (userData.role !== 'buyer') {
+                const roleMap = {
+                    'farmer': 'farmer-dashboard.html',
+                    'transporter': 'transporter-dashboard.html'
+                };
+                if (roleMap[userData.role]) {
+                    window.location.href = roleMap[userData.role];
+                    return;
+                }
+            }
+
+            const roleData = sessionStorage.getItem('roleData');
+            if (roleData) {
+                const data = JSON.parse(roleData);
+                buyerId = data.id || 1;
+            }
+
+            document.getElementById('buyerName').textContent = userData.name || 'Kaveri Fresh Foods';
+            document.getElementById('greetingName').textContent = userData.name || 'Kaveri Fresh Foods';
+            
+            loadDashboard(buyerId);
+        });
+
+        async function loadDashboard(buyerId) {
+            try {
+                const response = await fetch(`${API_URL}/dashboard/buyer/${buyerId}`);
+                const data = await response.json();
+                renderDashboard(data);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                renderDemoData();
+            }
+        }
+
+        function renderDashboard(data) {
+            const buyer = data.buyer || {};
+            document.getElementById('buyerName').textContent = buyer.company_name || 'Kaveri Fresh Foods';
+            document.getElementById('greetingName').textContent = buyer.company_name || 'Kaveri Fresh Foods';
+
+            const requirements = data.requirements || [];
+            
+            // Count active requirements (not fulfilled)
+            const activeReqs = requirements.filter(r => r.status !== 'fulfilled' && r.status !== 'delivered');
+            document.getElementById('activeRequirements').textContent = activeReqs.length;
+
+            // Calculate supply matched and unique farms from active requirements
+            let totalMatched = 0;
+            let uniqueFarms = new Set();
+            
+            for (const req of activeReqs) {
+                totalMatched += req.matched_quantity || 0;
+                // Get unique farm count from the requirement
+                const farmCount = req.unique_farm_count || req.match_count || 0;
+                // We need to fetch actual farm count from matches
+                if (req.id) {
+                    fetchFarmCount(req.id).then(count => {
+                        // Update UI after fetch
+                    });
+                }
+            }
+
+            // If no active requirements, show 0
+            if (activeReqs.length === 0) {
+                document.getElementById('supplyMatched').innerHTML = '0 <span class="currency">kg</span>';
+                document.getElementById('farmCount').textContent = '0';
+            } else {
+                document.getElementById('supplyMatched').innerHTML = `${Math.round(totalMatched).toLocaleString()} <span class="currency">kg</span>`;
+                // Get unique farms from the first active requirement's match count
+                const firstReq = activeReqs[0];
+                if (firstReq && firstReq.unique_farm_count) {
+                    document.getElementById('farmCount').textContent = firstReq.unique_farm_count || '0';
+                } else {
+                    document.getElementById('farmCount').textContent = firstReq?.match_count || '0';
+                }
+            }
+
+            // Get orders and count active deliveries
+            const orders = data.orders || [];
+            const activeOrders = orders.filter(o => o.order_status !== 'delivered' && o.order_status !== 'completed');
+            document.getElementById('activeDeliveries').textContent = activeOrders.length;
+
+            // Render sections
+            renderRequirements(activeReqs);
+            renderSupplyNetwork(activeReqs);
+            renderDeliveries(activeOrders);
+        }
+
+        async function fetchFarmCount(requirementId) {
+            try {
+                const response = await fetch(`${API_URL}/requirements/${requirementId}/matches`);
+                const matches = await response.json();
+                const uniqueFarms = new Set(matches.map(m => m.farmer_id));
+                return uniqueFarms.size;
+            } catch (error) {
+                return 0;
+            }
+        }
+
+        function renderRequirements(requirements) {
+            const container = document.getElementById('requirementsList');
+            if (!requirements || requirements.length === 0) {
+                container.innerHTML = `
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        No active requirements. <a href="buyer-requirement.html" style="color:var(--primary);">Post one →</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = requirements.map(r => `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">${getCropIcon(r.crop)}</div>
+                    <div class="card-content">
+                        <div class="card-title">${r.crop || 'Tomatoes'}</div>
+                        <div class="card-details">
+                            <span class="detail-item"><strong>${r.required_quantity || 0}</strong> kg</span>
+                            <span class="detail-item">Grade: <strong>${r.grade || 'A'}</strong></span>
+                            <span class="detail-item">₹${r.min_price || 0}–${r.max_price || 0}/kg</span>
+                            <span class="detail-item">📍 ${r.delivery_location || 'Chennai'}</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge ${r.status === 'fulfilled' ? 'fulfilled' : 'open'}">${r.status || 'Open'}</span>
+                            <span class="detail-item"><strong>${r.unique_farm_count || r.match_count || 0}</strong> farms matched</span>
+                            <a href="buyer-supply-network.html?req=${r.id}" class="btn-sm btn-primary-sm" style="text-decoration:none;">VIEW SUPPLY</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSupplyNetwork(requirements) {
+            const container = document.getElementById('supplyNetwork');
+            if (!requirements || requirements.length === 0) {
+                container.innerHTML = `
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        No active supply network. <a href="buyer-requirement.html" style="color:var(--primary);">Post a requirement →</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const r = requirements[0];
+            const matched = r.matched_quantity || 0;
+            const required = r.required_quantity || 0;
+            const pct = required > 0 ? Math.min((matched / required) * 100, 100) : 0;
+            const farmCount = r.unique_farm_count || r.match_count || 0;
+
+            container.innerHTML = `
+                <div class="opportunity-card fade-in">
+                    <div class="card-content" style="width:100%;">
+                        <div class="card-title">${r.crop || 'Tomatoes'} — ${r.company_name || 'Buyer'}</div>
+                        <div class="card-details" style="margin-bottom:12px;">
+                            <span class="detail-item"><strong>${Math.round(matched).toLocaleString()}</strong> / ${Math.round(required).toLocaleString()} kg matched</span>
+                            <span class="detail-item"><strong>${farmCount}</strong> farms</span>
+                            <span class="detail-item">${Math.round(pct)}% fulfilled</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill ${pct >= 100 ? 'fulfilled' : ''}" style="width:${Math.min(pct, 100)}%"></div>
+                            </div>
+                            <div class="progress-label">
+                                <span>${Math.round(pct)}%</span>
+                                <span>${pct >= 100 ? '✓ FULFILLED' : `${Math.round(Math.max(0, required - matched))} kg remaining`}</span>
+                            </div>
+                        </div>
+                        <div class="card-actions" style="margin-top:12px;">
+                            <a href="buyer-supply-network.html?req=${r.id}" class="btn-sm btn-primary-sm" style="text-decoration:none;">VIEW SUPPLY NETWORK</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDeliveries(orders) {
+            const container = document.getElementById('activeDelivery');
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        No active deliveries.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = orders.map(o => `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">🚚</div>
+                    <div class="card-content">
+                        <div class="card-title">${o.crop || 'Tomatoes'} — ${Math.round(o.total_quantity || 0).toLocaleString()}kg</div>
+                        <div class="card-details">
+                            <span class="detail-item">📍 ${o.delivery_location || 'Kumbakonam → Chennai'}</span>
+                            <span class="detail-item"><strong>${o.farm_count || 0}</strong> farms</span>
+                            <span class="detail-item">Order #: ${o.id || 'N/A'}</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge ${o.order_status === 'delivered' ? 'delivered' : 'in-transit'}">
+                                ${o.order_status || 'In Transit'}
+                            </span>
+                            <a href="tracking.html?role=buyer" class="btn-sm btn-primary-sm" style="text-decoration:none;">TRACK DELIVERY</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCropIcon(crop) {
+            const icons = {
+                'Tomatoes': '🍅',
+                'Rice': '🌾',
+                'Onions': '🧅',
+                'Chillies': '🌶️',
+                'Sugarcane': '🌿',
+                'Banana': '🍌',
+                'Brinjal': '🍆',
+                'Groundnut': '🥜',
+                'Maize': '🌽',
+                'Coconut': '🥥',
+                'Cotton': '🌾',
+                'Turmeric': '🟡'
+            };
+            return icons[crop] || '🌱';
+        }
+
+        function renderDemoData() {
+            document.getElementById('buyerName').textContent = 'Kaveri Fresh Foods';
+            document.getElementById('greetingName').textContent = 'Kaveri Fresh Foods';
+            
+            document.getElementById('activeRequirements').textContent = '1';
+            document.getElementById('supplyMatched').innerHTML = '9,600 <span class="currency">kg</span>';
+            document.getElementById('farmCount').textContent = '14';
+            document.getElementById('activeDeliveries').textContent = '1';
+
+            document.getElementById('requirementsList').innerHTML = `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">🍅</div>
+                    <div class="card-content">
+                        <div class="card-title">Tomatoes</div>
+                        <div class="card-details">
+                            <span class="detail-item"><strong>10,000</strong> kg</span>
+                            <span class="detail-item">Grade: <strong>A</strong></span>
+                            <span class="detail-item">₹26–28/kg</span>
+                            <span class="detail-item">📍 Chennai</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge open">Open</span>
+                            <span class="detail-item"><strong>14</strong> farms matched</span>
+                            <a href="buyer-supply-network.html" class="btn-sm btn-primary-sm" style="text-decoration:none;">VIEW SUPPLY</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('supplyNetwork').innerHTML = `
+                <div class="opportunity-card fade-in">
+                    <div class="card-content" style="width:100%;">
+                        <div class="card-title">Tomatoes — Kaveri Fresh Foods</div>
+                        <div class="card-details" style="margin-bottom:12px;">
+                            <span class="detail-item"><strong>9,600</strong> / 10,000 kg matched</span>
+                            <span class="detail-item"><strong>14</strong> farms</span>
+                            <span class="detail-item">96% fulfilled</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar"><div class="progress-fill" style="width:96%"></div></div>
+                            <div class="progress-label"><span>96%</span><span>400 kg remaining</span></div>
+                        </div>
+                        <div class="card-actions" style="margin-top:12px;">
+                            <a href="buyer-supply-network.html" class="btn-sm btn-primary-sm" style="text-decoration:none;">VIEW SUPPLY NETWORK</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('activeDelivery').innerHTML = `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">🚚</div>
+                    <div class="card-content">
+                        <div class="card-title">Tomatoes — 10,000kg</div>
+                        <div class="card-details">
+                            <span class="detail-item">📍 Kumbakonam → Chennai</span>
+                            <span class="detail-item"><strong>14</strong> farms</span>
+                            <span class="detail-item">Order #: 1</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge in-transit">In Transit</span>
+                            <a href="tracking.html?role=buyer" class="btn-sm btn-primary-sm" style="text-decoration:none;">TRACK DELIVERY</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Logout
+        document.querySelector('.btn-outline-sm')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

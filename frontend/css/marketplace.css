@@ -1,0 +1,351 @@
+/* ===== MARKETPLACE SPECIFIC STYLES ===== */
+
+/* Price Discovery */
+.price-discovery {
+    padding: 24px;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+}
+
+.price-discovery .market-range {
+    text-align: center;
+    padding: 16px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+}
+
+.price-discovery .market-range .range-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--gray-900);
+}
+
+.price-discovery .buyer-offers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.price-discovery .buyer-offer {
+    padding: 16px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+}
+
+.price-discovery .buyer-offer:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow);
+}
+
+.price-discovery .buyer-offer .offer-price {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.price-discovery .buyer-offer .offer-buyer {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 4px 0;
+}
+
+.price-discovery .buyer-offer .offer-detail {
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.price-discovery .buyer-offer.best {
+    border-color: var(--success);
+    background: #F0FFF4;
+}
+
+.price-discovery .buyer-offer.best .offer-price {
+    color: var(--success);
+}
+
+/* Matching Results */
+.match-result {
+    padding: 16px;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.match-result .match-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.match-result .match-info .farmer-name {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.match-result .match-info .match-details {
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+.match-result .match-score {
+    padding: 4px 16px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 14px;
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.match-result .match-score.high {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.match-result .match-score.medium {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+.match-result .match-score.low {
+    background: #F8D7DA;
+    color: #721C24;
+}
+
+/* Supply Network */
+.supply-network {
+    padding: 24px;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+}
+
+.supply-network .network-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.supply-network .stat-item {
+    text-align: center;
+    padding: 12px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+}
+
+.supply-network .stat-item .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--gray-900);
+}
+
+.supply-network .stat-item .stat-label {
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.supply-network .farm-contributions {
+    margin-top: 16px;
+}
+
+.supply-network .farm-contribution {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.supply-network .farm-contribution .farm-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.supply-network .farm-contribution .farm-info .name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.supply-network .farm-contribution .farm-info .location {
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.supply-network .farm-contribution .farm-qty {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.supply-network .farm-contribution .farm-status {
+    font-size: 13px;
+    padding: 2px 12px;
+    border-radius: 50px;
+}
+
+.supply-network .farm-contribution .farm-status.confirmed {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.supply-network .farm-contribution .farm-status.pending {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+/* Verification Badges */
+.verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.verified-badge .icon {
+    font-size: 14px;
+}
+
+/* Freshness Indicator */
+.freshness-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.freshness-indicator.good {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.freshness-indicator.warning {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+.freshness-indicator.critical {
+    background: #F8D7DA;
+    color: #721C24;
+}
+
+/* Barter Exchange */
+.barter-card {
+    padding: 16px;
+    background: linear-gradient(135deg, #FFF8E1, #FFF3E0);
+    border: 1px solid #FFE0B2;
+    border-radius: var(--radius-sm);
+    margin-top: 16px;
+}
+
+.barter-card .barter-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #E65100;
+}
+
+.barter-card .barter-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.barter-card .barter-content .offer {
+    font-size: 14px;
+    color: var(--gray-700);
+}
+
+.barter-card .barter-content .offer strong {
+    color: var(--gray-900);
+}
+
+/* Voice Input */
+.voice-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.voice-input .mic-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: 50%;
+    background: var(--white);
+    cursor: pointer;
+    font-size: 18px;
+    transition: var(--transition);
+}
+
+.voice-input .mic-btn:hover {
+    border-color: var(--primary);
+    background: var(--gray-50);
+}
+
+.voice-input .mic-btn.active {
+    border-color: var(--danger);
+    background: #F8D7DA;
+    animation: pulse 1.5s infinite;
+}
+
+.voice-input .mic-btn .recording-dot {
+    display: none;
+    width: 10px;
+    height: 10px;
+    background: var(--danger);
+    border-radius: 50%;
+}
+
+.voice-input .mic-btn.active .recording-dot {
+    display: inline-block;
+}
+
+.voice-input .mic-btn .mic-icon {
+    display: inline-block;
+}
+
+.voice-input .mic-btn.active .mic-icon {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .price-discovery .buyer-offers {
+        grid-template-columns: 1fr;
+    }
+    
+    .supply-network .network-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .match-result {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .barter-card .barter-content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Discovery — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/marketplace.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .buyer-card { background:var(--white);border-radius:var(--radius);padding:24px;border:1px solid var(--gray-200);margin-bottom:16px;transition:var(--transition);display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start; }
+        .buyer-card:hover { box-shadow:var(--shadow);border-color:var(--primary-light); }
+        .buyer-card .buyer-icon { font-size:40px;flex-shrink:0; }
+        .buyer-card .card-content { flex:1;min-width:200px; }
+        .buyer-card .buyer-name { font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px; }
+        .buyer-card .verified-badge { color:var(--success);font-size:16px; }
+        .buyer-card .requirements { display:flex;flex-wrap:wrap;gap:8px 20px;margin:8px 0;font-size:14px;color:var(--gray-600); }
+        .buyer-card .requirements strong { color:var(--gray-800); }
+        .buyer-card .match-badge { display:inline-block;padding:4px 16px;border-radius:50px;font-weight:700;font-size:14px;background:#D4EDDA;color:#155724; }
+        .buyer-card .match-badge.high { background:#D4EDDA;color:#155724; }
+        .buyer-card .match-badge.medium { background:#FFF3CD;color:#856404; }
+        .btn-join { padding:10px 32px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);font-weight:700;cursor:pointer;transition:var(--transition);font-family:inherit;font-size:14px; }
+        .btn-join:hover { background:var(--primary-dark);transform:translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="dashboard-nav">
+            <div class="logo"><span class="logo-icon">🌾</span><span class="logo-text">VVT</span></div>
+            <div class="nav-actions">
+                <div class="user-badge"><span>👨‍🌾</span><span>Ravi Kumar</span><span class="verified">✓</span></div>
+                <a href="farmer-dashboard.html" class="btn-outline-sm" style="padding:6px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);text-decoration:none;color:var(--gray-600);font-size:14px;">← Back</a>
+            </div>
+        </nav>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header fade-in">
+                <h1>👀 Buyers Looking for Tomatoes</h1>
+                <p class="subtitle">Smart matched buyers based on your harvest</p>
+            </header>
+
+            <div id="buyerList">
+                <!-- Kaveri Fresh Foods -->
+                <div class="buyer-card fade-in">
+                    <div class="buyer-icon">🏢</div>
+                    <div class="card-content">
+                        <div class="buyer-name">
+                            Kaveri Fresh Foods
+                            <span class="verified-badge">✓ Verified</span>
+                        </div>
+                        <div class="requirements">
+                            <span><strong>10,000</strong> kg required</span>
+                            <span><strong>₹27</strong>/kg offered</span>
+                            <span>Grade: <strong>A</strong></span>
+                            <span>📍 Chennai</span>
+                            <span>📅 Required by: 15 Sept</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px;">
+                            <span class="match-badge high">⭐ 92% Match</span>
+                            <span style="font-size:13px;color:var(--gray-600);">Your contribution: <strong>500 kg</strong></span>
+                            <button class="btn-join" onclick="joinOrder(1)">JOIN ORDER</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chennai Retail -->
+                <div class="buyer-card fade-in">
+                    <div class="buyer-icon">🏪</div>
+                    <div class="card-content">
+                        <div class="buyer-name">
+                            Chennai Retail Mart
+                            <span class="verified-badge">✓ Verified</span>
+                        </div>
+                        <div class="requirements">
+                            <span><strong>2,000</strong> kg required</span>
+                            <span><strong>₹26</strong>/kg offered</span>
+                            <span>Grade: <strong>A</strong></span>
+                            <span>📍 Chennai</span>
+                            <span>📅 Required by: 20 Sept</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px;">
+                            <span class="match-badge medium">⭐ 78% Match</span>
+                            <span style="font-size:13px;color:var(--gray-600);">Your contribution: <strong>500 kg</strong></span>
+                            <button class="btn-join" onclick="joinOrder(2)">JOIN ORDER</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Premium Foods -->
+                <div class="buyer-card fade-in">
+                    <div class="buyer-icon">🍽️</div>
+                    <div class="card-content">
+                        <div class="buyer-name">
+                            Premium Foods
+                            <span class="verified-badge">✓ Verified</span>
+                        </div>
+                        <div class="requirements">
+                            <span><strong>1,500</strong> kg required</span>
+                            <span><strong>₹28</strong>/kg offered</span>
+                            <span>Grade: <strong>A+</strong></span>
+                            <span>📍 Chennai</span>
+                            <span>📅 Required by: 18 Sept</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px;">
+                            <span class="match-badge high">⭐ 85% Match</span>
+                            <span style="font-size:13px;color:var(--gray-600);">Your contribution: <strong>500 kg</strong></span>
+                            <button class="btn-join" onclick="joinOrder(3)">JOIN ORDER</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <a href="farmer-dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+                <a href="farmer-price.html" class="nav-item"><span class="nav-icon">📊</span>Market</a>
+                <a href="farmer-sell.html" class="nav-item"><span class="nav-icon">🌱</span>Sell</a>
+                <a href="farmer-orders.html" class="nav-item"><span class="nav-icon">📦</span>Orders</a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        async function joinOrder(matchId) {
+            try {
+                const response = await fetch(`${API_URL}/matches/${matchId}/confirm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                alert(data.message || '✅ You have joined this order successfully!');
+                location.reload();
+            } catch (error) {
+                alert('✅ Order joined successfully! (Demo)');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

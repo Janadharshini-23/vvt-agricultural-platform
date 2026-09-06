@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Orders — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="dashboard-nav">
+            <div class="logo"><span class="logo-icon">🌾</span><span class="logo-text">VVT</span></div>
+            <div class="nav-actions">
+                <div class="user-badge"><span>🏢</span><span>Kaveri Fresh Foods</span><span class="verified">✓</span></div>
+                <a href="buyer-dashboard.html" class="btn-outline-sm" style="padding:6px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);text-decoration:none;color:var(--gray-600);font-size:14px;">← Back</a>
+            </div>
+        </nav>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header fade-in">
+                <h1>📦 Order Management</h1>
+                <p class="subtitle">Track all your procurement orders</p>
+            </header>
+
+            <!-- Active Order -->
+            <div class="order-card" style="background:var(--white);border-radius:var(--radius);padding:24px;border:1px solid var(--gray-200);margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <div style="font-size:20px;font-weight:700;">🍅 Tomatoes</div>
+                        <div style="color:var(--gray-600);font-size:14px;">Order #VVT-2026-001</div>
+                    </div>
+                    <span class="status-badge in-transit">IN TRANSIT</span>
+                </div>
+
+                <div style="display:flex;flex-wrap:wrap;gap:12px 24px;margin:12px 0;font-size:14px;color:var(--gray-600);">
+                    <span><strong>10,000</strong> kg</span>
+                    <span>₹<strong>27</strong>/kg</span>
+                    <span><strong>14</strong> farms</span>
+                    <span>📍 <strong>Kumbakonam → Chennai</strong></span>
+                </div>
+
+                <div style="padding:12px 16px;background:var(--gray-50);border-radius:8px;margin:8px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <div style="font-size:14px;color:var(--gray-600);">Total Order Value</div>
+                        <div style="font-size:24px;font-weight:800;color:var(--primary);">₹2,70,000</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:14px;color:var(--gray-600);">Payment Status</div>
+                        <div style="color:var(--success);font-weight:600;">✓ Escrow Simulated</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;">
+                    <a href="tracking.html" class="btn-sm btn-primary-sm" style="padding:10px 24px;text-decoration:none;display:inline-block;background:var(--primary);color:white;border-radius:8px;font-weight:600;">🔍 TRACK DELIVERY</a>
+                    <a href="buyer-supply-network.html" class="btn-sm btn-outline-sm" style="padding:10px 24px;text-decoration:none;display:inline-block;border:1px solid var(--gray-300);border-radius:8px;font-weight:600;color:var(--gray-700);">VIEW SUPPLY NETWORK</a>
+                </div>
+            </div>
+
+            <!-- Completed Order -->
+            <div class="order-card" style="background:var(--white);border-radius:var(--radius);padding:24px;border:1px solid var(--gray-200);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <div style="font-size:20px;font-weight:700;">🌾 Rice</div>
+                        <div style="color:var(--gray-600);font-size:14px;">Order #VVT-2026-002</div>
+                    </div>
+                    <span class="status-badge delivered">DELIVERED</span>
+                </div>
+
+                <div style="display:flex;flex-wrap:wrap;gap:12px 24px;margin:12px 0;font-size:14px;color:var(--gray-600);">
+                    <span><strong>2,000</strong> kg</span>
+                    <span>₹<strong>32</strong>/kg</span>
+                    <span><strong>5</strong> farms</span>
+                    <span>📍 <strong>Thanjavur → Chennai</strong></span>
+                </div>
+
+                <div style="padding:12px 16px;background:var(--gray-50);border-radius:8px;margin:8px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <div style="font-size:14px;color:var(--gray-600);">Total Order Value</div>
+                        <div style="font-size:24px;font-weight:800;color:var(--gray-900);">₹64,000</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:14px;color:var(--gray-600);">Payment Status</div>
+                        <div style="color:var(--success);font-weight:600;">✅ Payment Released</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:8px;">
+                    <span class="status-badge delivered" style="display:inline-block;">✓ DELIVERED — 12 Sept 2026</span>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <a href="buyer-dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+                <a href="buyer-requirement.html" class="nav-item"><span class="nav-icon">📋</span>Requirements</a>
+                <a href="buyer-supply-network.html" class="nav-item"><span class="nav-icon">🌾</span>Supply</a>
+                <a href="buyer-orders.html" class="nav-item active"><span class="nav-icon">📦</span>Orders</a>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>

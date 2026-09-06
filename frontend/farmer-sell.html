@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Harvest — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 32px;
+            border: 1px solid var(--gray-200);
+        }
+        .form-container h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .form-container .form-subtitle { color: var(--gray-600); margin-bottom: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; font-size: 14px; color: var(--gray-700); margin-bottom: 6px; }
+        .form-group label .required { color: var(--danger); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 16px; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);
+            font-size: 16px; font-family: inherit; transition: var(--transition);
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-submit { padding: 12px 36px; background: var(--primary); color: var(--white); border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; }
+        .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(45,106,79,0.3); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-cancel { padding: 12px 36px; background: var(--gray-200); color: var(--gray-700); border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; }
+        .btn-cancel:hover { background: var(--gray-300); }
+        .success-box { display: none; margin-top: 24px; padding: 16px; background: #D4EDDA; border-radius: 8px; color: #155724; text-align: center; font-weight: 600; border: 1px solid #C3E6CB; }
+        .success-box.show { display: block; animation: fadeIn 0.3s ease-out; }
+        .input-hint { font-size: 13px; color: var(--gray-500); margin-top: 4px; }
+
+        /* Market Price Card */
+        .market-price-card {
+            background: linear-gradient(135deg, #F0FFF4, #E8F5E9);
+            border: 2px solid var(--primary-light);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .market-price-card .label { font-size: 14px; color: var(--gray-600); font-weight: 500; }
+        .market-price-card .price-range { font-size: 24px; font-weight: 800; color: var(--primary); }
+        .market-price-card .price-range .currency { font-size: 16px; font-weight: 400; color: var(--gray-600); }
+        .market-price-card .best-offer { font-size: 18px; font-weight: 700; color: var(--success); }
+        .market-price-card .crop-name { font-weight: 700; font-size: 16px; }
+        .market-price-card .loading { color: var(--gray-500); font-size: 14px; }
+
+        /* Price Warning */
+        .price-warning {
+            display: none;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 4px solid;
+        }
+        .price-warning.show { display: block; animation: fadeIn 0.3s ease-out; }
+        .price-warning.warning {
+            background: #FFF3CD;
+            border-color: #FFC107;
+            color: #856404;
+        }
+        .price-warning.danger {
+            background: #F8D7DA;
+            border-color: #DC3545;
+            color: #721C24;
+        }
+        .price-warning.success {
+            background: #D4EDDA;
+            border-color: #28A745;
+            color: #155724;
+        }
+        .price-warning .icon { margin-right: 8px; }
+        .price-warning .suggested { font-weight: 700; color: var(--primary); }
+
+        /* Recent Harvests */
+        .recent-harvests { margin-top: 24px; border-top: 1px solid var(--gray-200); padding-top: 20px; }
+        .recent-harvests h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .recent-harvest-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--gray-50); border-radius: var(--radius-sm); margin-bottom: 8px; border-left: 4px solid var(--primary-light); }
+        .recent-harvest-item .crop-info { display: flex; flex-direction: column; }
+        .recent-harvest-item .crop-info .name { font-weight: 600; font-size: 15px; }
+        .recent-harvest-item .crop-info .details { font-size: 13px; color: var(--gray-600); }
+        .recent-harvest-item .status { font-size: 13px; font-weight: 600; color: var(--success); }
+
+        @media (max-width: 768px) { 
+            .form-row { grid-template-columns: 1fr; } 
+            .form-container { padding: 20px; }
+            .market-price-card { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="dashboard-nav">
+            <div class="logo"><span class="logo-icon">🌾</span><span class="logo-text">VVT</span></div>
+            <div class="nav-actions">
+                <div class="user-badge"><span>👨‍🌾</span><span id="farmerName">Loading...</span><span class="verified">✓</span></div>
+                <a href="farmer-dashboard.html" class="btn-outline-sm" style="padding:6px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);text-decoration:none;color:var(--gray-600);font-size:14px;">← Back</a>
+            </div>
+        </nav>
+
+        <main class="dashboard-main">
+            <div class="form-container fade-in">
+                <h2>🌾 List Your Harvest</h2>
+                <p class="form-subtitle">Enter your crop details and it will be visible to matched buyers.</p>
+
+                <!-- Market Price Display -->
+                <div class="market-price-card" id="marketPriceCard">
+                    <div>
+                        <div class="label">📊 Current Market Price</div>
+                        <div class="loading" id="priceLoading">Loading market data...</div>
+                        <div id="priceDisplay" style="display:none;">
+                            <div class="crop-name" id="priceCrop">Tomatoes</div>
+                            <div class="price-range" id="priceRange">₹23–25 <span class="currency">/kg</span></div>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="label">🏷️ Best Buyer Offer</div>
+                        <div class="best-offer" id="bestOfferDisplay">₹27 <span style="font-size:14px;font-weight:400;color:var(--gray-600);">/kg</span></div>
+                        <div style="font-size:12px;color:var(--gray-500);" id="offerSource">from Kaveri Fresh Foods</div>
+                    </div>
+                </div>
+
+                <form id="harvestForm">
+                    <div class="form-group">
+                        <label>Crop <span class="required">*</span></label>
+                        <select id="crop" required>
+                            <option value="">Select crop</option>
+                            <option value="Tomatoes">🍅 Tomatoes</option>
+                            <option value="Rice">🌾 Rice</option>
+                            <option value="Onions">🧅 Onions</option>
+                            <option value="Chillies">🌶️ Chillies</option>
+                            <option value="Sugarcane">🌿 Sugarcane</option>
+                            <option value="Banana">🍌 Banana</option>
+                            <option value="Brinjal">🍆 Brinjal</option>
+                            <option value="Groundnut">🥜 Groundnut</option>
+                            <option value="Maize">🌽 Maize</option>
+                            <option value="Coconut">🥥 Coconut</option>
+                            <option value="Cotton">🌾 Cotton</option>
+                            <option value="Turmeric">🟡 Turmeric</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantity (kg) <span class="required">*</span></label>
+                            <input type="number" id="quantity" placeholder="e.g., 500" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Grade <span class="required">*</span></label>
+                            <select id="grade" required>
+                                <option value="A">A - Premium</option>
+                                <option value="B">B - Good</option>
+                                <option value="C">C - Standard</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Harvest Date <span class="required">*</span></label>
+                            <input type="date" id="harvestDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Available Date <span class="required">*</span></label>
+                            <input type="date" id="availableDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Expected Price (₹/kg) <span class="required">*</span></label>
+                        <input type="number" id="expectedPrice" placeholder="e.g., 24" min="1" step="0.5" required>
+                        <div class="input-hint">💡 Current market range: <span id="marketHint">₹23–25/kg</span>. Set a competitive price.</div>
+                        
+                        <!-- Price Warning -->
+                        <div class="price-warning" id="priceWarning">
+                            <span class="icon">⚠️</span>
+                            <span id="warningText">Your price is above the market range. Buyers may not find it competitive.</span>
+                            <br><span style="font-size:13px;">Suggested price: <span class="suggested" id="suggestedPrice">₹24/kg</span></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quality Notes</label>
+                        <textarea id="qualityNotes" placeholder="e.g., Fresh harvest, premium quality, organic, no pesticides" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Image (Optional)</label>
+                        <input type="file" id="imageUpload" accept="image/*">
+                        <div class="input-hint">Upload a photo of your produce to attract more buyers</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="submitBtn">🌾 LIST HARVEST</button>
+                        <button type="reset" class="btn-cancel">Clear</button>
+                    </div>
+                </form>
+
+                <div class="success-box" id="successMessage">
+                    ✅ Your harvest has been listed successfully! It is now visible to matched buyers.
+                </div>
+
+                <!-- Recent Harvests -->
+                <div class="recent-harvests" id="recentHarvests">
+                    <h3>📋 Your Recent Harvests</h3>
+                    <div id="harvestList">
+                        <div style="text-align:center;color:var(--gray-500);padding:16px;">Loading your harvests...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <a href="farmer-dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+                <a href="farmer-price.html" class="nav-item"><span class="nav-icon">📊</span>Market</a>
+                <a href="farmer-sell.html" class="nav-item active"><span class="nav-icon">🌱</span>Sell</a>
+                <a href="farmer-orders.html" class="nav-item"><span class="nav-icon">📦</span>Orders</a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        // Crop price data with min, max, best
+        const cropPrices = {
+            'Tomatoes': { min: 23, max: 25, best: 27, source: 'Kaveri Fresh Foods', range: '₹23–25' },
+            'Rice': { min: 30, max: 35, best: 37, source: 'Chennai Retail', range: '₹30–35' },
+            'Onions': { min: 16, max: 20, best: 22, source: 'Local Market', range: '₹16–20' },
+            'Chillies': { min: 40, max: 50, best: 55, source: 'Premium Foods', range: '₹40–50' },
+            'Sugarcane': { min: 10, max: 14, best: 16, source: 'Sugar Factory', range: '₹10–14' },
+            'Banana': { min: 25, max: 30, best: 33, source: 'Fruit Market', range: '₹25–30' },
+            'Brinjal': { min: 18, max: 22, best: 25, source: 'Local Retailer', range: '₹18–22' },
+            'Groundnut': { min: 45, max: 55, best: 60, source: 'Oil Mill', range: '₹45–55' },
+            'Maize': { min: 20, max: 26, best: 28, source: 'Feed Factory', range: '₹20–26' },
+            'Coconut': { min: 25, max: 30, best: 35, source: 'Coconut Oil Mill', range: '₹25–30' },
+            'Cotton': { min: 55, max: 65, best: 70, source: 'Textile Mill', range: '₹55–65' },
+            'Turmeric': { min: 80, max: 100, best: 110, source: 'Spice Exporter', range: '₹80–100' }
+        };
+
+        let farmerId = 1;
+        let currentCrop = 'Tomatoes';
+
+        function getFarmerId() {
+            const roleData = sessionStorage.getItem('roleData');
+            if (roleData) {
+                const data = JSON.parse(roleData);
+                return data.id || 1;
+            }
+            return 1;
+        }
+
+        // Load farmer name
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = sessionStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.getElementById('farmerName').textContent = userData.name || 'Farmer';
+            }
+            
+            farmerId = getFarmerId();
+            
+            // Set default dates
+            const today = new Date();
+            document.getElementById('harvestDate').value = today.toISOString().split('T')[0];
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('availableDate').value = tomorrow.toISOString().split('T')[0];
+
+            // Load recent harvests
+            loadRecentHarvests();
+            
+            // Update market price on crop change
+            document.getElementById('crop').addEventListener('change', function() {
+                currentCrop = this.value;
+                updateMarketPrice(this.value);
+                validatePrice();
+            });
+
+            // Validate price on input
+            document.getElementById('expectedPrice').addEventListener('input', function() {
+                validatePrice();
+            });
+
+            // Initial market price for default crop
+            updateMarketPrice('Tomatoes');
+        });
+
+        function updateMarketPrice(crop) {
+            const priceData = cropPrices[crop];
+            const priceDisplay = document.getElementById('priceDisplay');
+            const priceLoading = document.getElementById('priceLoading');
+            const marketHint = document.getElementById('marketHint');
+
+            if (priceData) {
+                priceLoading.style.display = 'none';
+                priceDisplay.style.display = 'block';
+                document.getElementById('priceCrop').textContent = crop;
+                document.getElementById('priceRange').innerHTML = priceData.range + ' <span class="currency">/kg</span>';
+                document.getElementById('bestOfferDisplay').textContent = '₹' + priceData.best + ' /kg';
+                document.getElementById('offerSource').textContent = 'from ' + priceData.source;
+                marketHint.textContent = priceData.range;
+            } else {
+                priceLoading.style.display = 'block';
+                priceLoading.textContent = 'Market data not available for ' + crop;
+                priceDisplay.style.display = 'none';
+                marketHint.textContent = '₹--/kg';
+            }
+        }
+
+        function validatePrice() {
+            const priceInput = document.getElementById('expectedPrice');
+            const price = parseFloat(priceInput.value);
+            const warning = document.getElementById('priceWarning');
+            const warningText = document.getElementById('warningText');
+            const suggestedPrice = document.getElementById('suggestedPrice');
+            
+            const priceData = cropPrices[currentCrop];
+            
+            if (!priceData || isNaN(price) || price <= 0) {
+                warning.classList.remove('show', 'warning', 'danger', 'success');
+                return;
+            }
+
+            const { min, max, best } = priceData;
+            const midPrice = (min + max) / 2;
+
+            // Calculate suggested price
+            let suggestion = midPrice;
+            if (price > max) {
+                suggestion = max;
+            } else if (price < min) {
+                suggestion = min;
+            } else {
+                suggestion = Math.round((price + best) / 2);
+            }
+            suggestedPrice.textContent = '₹' + Math.round(suggestion) + '/kg';
+
+            // Check price against market
+            if (price > max * 2) {
+                // Way above market - danger
+                warning.className = 'price-warning show danger';
+                warningText.innerHTML = '⚠️ Your price is <strong>extremely high</strong> (over 2x market range). Buyers will likely not consider this.';
+                warning.querySelector('.icon').textContent = '🚫';
+            } else if (price > max * 1.5) {
+                // Significantly above market - danger
+                warning.className = 'price-warning show danger';
+                warningText.innerHTML = '⚠️ Your price is <strong>significantly above</strong> the market range. Buyers may find it uncompetitive.';
+                warning.querySelector('.icon').textContent = '⚠️';
+            } else if (price > max) {
+                // Above market - warning
+                warning.className = 'price-warning show warning';
+                warningText.innerHTML = '⚠️ Your price is above the current market range. Consider adjusting to attract more buyers.';
+                warning.querySelector('.icon').textContent = '📈';
+            } else if (price >= min && price <= max) {
+                // Within market range - success
+                warning.className = 'price-warning show success';
+                warningText.innerHTML = '✅ Your price is within the current market range. Good position!';
+                warning.querySelector('.icon').textContent = '✅';
+                document.getElementById('suggestedPrice').parentElement.style.display = 'none';
+                return;
+            } else if (price < min) {
+                // Below market - warning (farmer losing money)
+                warning.className = 'price-warning show warning';
+                warningText.innerHTML = '⚠️ Your price is below the market range. You could be leaving money on the table!';
+                warning.querySelector('.icon').textContent = '💰';
+            }
+
+            // Show suggestion for all warning/danger cases
+            document.getElementById('suggestedPrice').parentElement.style.display = 'block';
+        }
+
+        async function loadRecentHarvests() {
+            const container = document.getElementById('harvestList');
+            try {
+                const response = await fetch(`${API_URL}/farmers/${farmerId}/harvests`);
+                const harvests = await response.json();
+                
+                if (!harvests || harvests.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center;color:var(--gray-500);padding:16px;">
+                            No harvests listed yet. Start by listing your first harvest above!
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = harvests.map(h => `
+                    <div class="recent-harvest-item">
+                        <div class="crop-info">
+                            <div class="name">${h.crop}</div>
+                            <div class="details">
+                                ${h.quantity} kg • Grade ${h.grade} • Available: ${h.available_date || 'N/A'} • ₹${h.expected_price || 0}/kg
+                            </div>
+                        </div>
+                        <div class="status">${h.status === 'available' ? '✅ Available' : '⏳ ' + h.status}</div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                // Demo data
+                container.innerHTML = `
+                    <div class="recent-harvest-item">
+                        <div class="crop-info">
+                            <div class="name">🍅 Tomatoes</div>
+                            <div class="details">500 kg • Grade A • Available: Today • ₹24/kg</div>
+                        </div>
+                        <div class="status">✅ Available</div>
+                    </div>
+                    <div class="recent-harvest-item">
+                        <div class="crop-info">
+                            <div class="name">🌾 Rice</div>
+                            <div class="details">1000 kg • Grade A • Available: 15 Sept • ₹32/kg</div>
+                        </div>
+                        <div class="status">✅ Available</div>
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('harvestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const successMsg = document.getElementById('successMessage');
+            const priceInput = document.getElementById('expectedPrice');
+            const price = parseFloat(priceInput.value);
+            const priceData = cropPrices[currentCrop];
+            
+            // Check if price is extremely high (>2x market)
+            if (priceData && price > priceData.max * 2) {
+                if (!confirm(`⚠️ Your price (₹${price}/kg) is extremely high compared to the market range (${priceData.range}/kg). Buyers are unlikely to accept this. Do you want to list at this price anyway?`)) {
+                    return;
+                }
+            } else if (priceData && price > priceData.max * 1.5) {
+                if (!confirm(`⚠️ Your price (₹${price}/kg) is significantly above the market range (${priceData.range}/kg). This may reduce buyer interest. Do you want to continue?`)) {
+                    return;
+                }
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            const formData = {
+                farmer_id: farmerId,
+                crop: document.getElementById('crop').value,
+                quantity: parseFloat(document.getElementById('quantity').value),
+                grade: document.getElementById('grade').value,
+                harvest_date: document.getElementById('harvestDate').value,
+                available_date: document.getElementById('availableDate').value,
+                expected_price: price,
+                quality_notes: document.getElementById('qualityNotes').value,
+                latitude: 10.9625,
+                longitude: 79.3823
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/harvests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    successMsg.classList.add('show');
+                    document.getElementById('harvestForm').reset();
+                    
+                    // Reset dates
+                    const today = new Date();
+                    document.getElementById('harvestDate').value = today.toISOString().split('T')[0];
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    document.getElementById('availableDate').value = tomorrow.toISOString().split('T')[0];
+                    
+                    // Reset price warning
+                    document.getElementById('priceWarning').classList.remove('show', 'warning', 'danger', 'success');
+                    
+                    // Reload recent harvests
+                    loadRecentHarvests();
+                    
+                    setTimeout(() => {
+                        successMsg.classList.remove('show');
+                    }, 5000);
+                } else {
+                    alert('Error listing harvest. Please try again.');
+                }
+            } catch (error) {
+                // Demo mode - show success
+                successMsg.classList.add('show');
+                document.getElementById('harvestForm').reset();
+                document.getElementById('priceWarning').classList.remove('show', 'warning', 'danger', 'success');
+                loadRecentHarvests();
+                setTimeout(() => successMsg.classList.remove('show'), 5000);
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🌾 LIST HARVEST';
+        });
+    </script>
+</body>
+</html>

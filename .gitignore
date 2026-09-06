@@ -1,0 +1,56 @@
+# Create .gitignore file
+echo "# Node modules
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Database
+backend/database/vvt.db
+*.db
+*.db-journal
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build files
+dist/
+build/
+*.min.js
+*.min.css
+
+# Backup files
+*.bak
+*.backup
+
+# SQLite files
+*.db-shm
+*.db-wal
+
+# Frontend assets
+frontend/assets/uploads/
+*.png
+*.jpg
+*.jpeg
+*.gif
+!assets/logo.png" > .gitignore

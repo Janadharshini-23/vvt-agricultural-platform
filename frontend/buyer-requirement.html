@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Requirement — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .form-container { max-width: 750px; margin: 0 auto; background: var(--white); border-radius: var(--radius); padding: 32px; border: 1px solid var(--gray-200); }
+        .form-container h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .form-container .form-subtitle { color: var(--gray-600); margin-bottom: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; font-size: 14px; color: var(--gray-700); margin-bottom: 6px; }
+        .form-group label .required { color: var(--danger); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 16px; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);
+            font-size: 16px; font-family: inherit; transition: var(--transition);
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-submit { padding: 12px 36px; background: var(--primary); color: var(--white); border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; }
+        .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(45,106,79,0.3); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-cancel { padding: 12px 36px; background: var(--gray-200); color: var(--gray-700); border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; cursor: pointer; transition: var(--transition); font-family: inherit; }
+        .btn-cancel:hover { background: var(--gray-300); }
+        .result-box { display: none; margin-top: 24px; padding: 20px; background: #D4EDDA; border-radius: 8px; border: 1px solid #C3E6CB; }
+        .result-box.show { display: block; animation: fadeIn 0.3s ease-out; }
+        .result-box .title { font-weight: 700; font-size: 18px; color: #155724; }
+        .result-box .details { margin-top: 8px; color: #155724; }
+        .result-box .details .stat { display: inline-block; margin-right: 24px; }
+        .result-box .btn-view { margin-top: 12px; display: inline-block; padding: 10px 24px; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 600; }
+        .result-box .btn-view:hover { background: var(--primary-dark); }
+
+        /* Price Info Box */
+        .price-info-box { 
+            background: linear-gradient(135deg, #E8F5E9, #F1F8E9); 
+            border: 2px solid var(--primary-light); 
+            border-radius: var(--radius-sm); 
+            padding: 16px 20px; 
+            margin-bottom: 24px;
+        }
+        .price-info-box .title { font-weight: 700; font-size: 16px; margin-bottom: 8px; color: var(--primary-dark); }
+        .price-info-box .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed rgba(0,0,0,0.1); }
+        .price-info-box .row:last-child { border-bottom: none; font-weight: 700; font-size: 18px; padding-top: 8px; }
+        .price-info-box .row .label { color: var(--gray-600); }
+        .price-info-box .row .value { font-weight: 600; }
+        .price-info-box .row .value.green { color: var(--success); }
+        .price-info-box .row .value.blue { color: var(--secondary); }
+        .price-info-box .row .value.orange { color: #E65100; }
+
+        /* Transport Info */
+        .transport-info { 
+            background: #FFF8E1; 
+            border: 1px solid #FFE0B2; 
+            border-radius: var(--radius-sm); 
+            padding: 12px 16px; 
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .transport-info .route { font-weight: 600; }
+        .transport-info .cost { color: var(--primary); font-weight: 700; }
+
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .form-container { padding: 20px; } }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="dashboard-nav">
+            <div class="logo"><span class="logo-icon">🌾</span><span class="logo-text">VVT</span></div>
+            <div class="nav-actions">
+                <div class="user-badge"><span>🏢</span><span id="buyerName">Loading...</span><span class="verified">✓</span></div>
+                <a href="buyer-dashboard.html" class="btn-outline-sm" style="padding:6px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);text-decoration:none;color:var(--gray-600);font-size:14px;">← Back</a>
+            </div>
+        </nav>
+
+        <main class="dashboard-main">
+            <div class="form-container fade-in">
+                <h2>📋 Post Buyer Requirement</h2>
+                <p class="form-subtitle">Tell us what you need and we'll find matching farm supply with optimized logistics.</p>
+
+                <!-- Price Info - Shows breakdown -->
+                <div class="price-info-box" id="priceInfoBox">
+                    <div class="title">💰 Price Breakdown</div>
+                    <div class="row">
+                        <span class="label">Base Price (Farmer gets)</span>
+                        <span class="value green" id="basePriceDisplay">₹0/kg</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">🚚 Logistics Cost (Transport)</span>
+                        <span class="value orange" id="logisticsCostDisplay">₹0/kg</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Final Price (You pay)</span>
+                        <span class="value blue" id="finalPriceDisplay">₹0/kg</span>
+                    </div>
+                    <div class="transport-info" id="transportInfo">
+                        <div>📍 <span class="route">Kumbakonam → Chennai</span></div>
+                        <div>📏 Distance: <strong>320 km</strong> | ⏱️ Est. Time: <strong>8 hrs</strong></div>
+                        <div>⛽ Fuel Efficient Route: <strong>NH 38</strong> (Toll-free alternate available)</div>
+                        <div>🚛 Recommended Vehicle: <strong>10-ton Truck</strong> (₹18/km)</div>
+                    </div>
+                </div>
+
+                <form id="requirementForm">
+                    <div class="form-group">
+                        <label>Crop <span class="required">*</span></label>
+                        <select id="crop" required>
+                            <option value="">Select crop</option>
+                            <option value="Tomatoes">🍅 Tomatoes</option>
+                            <option value="Rice">🌾 Rice</option>
+                            <option value="Onions">🧅 Onions</option>
+                            <option value="Chillies">🌶️ Chillies</option>
+                            <option value="Sugarcane">🌿 Sugarcane</option>
+                            <option value="Banana">🍌 Banana</option>
+                            <option value="Brinjal">🍆 Brinjal</option>
+                            <option value="Groundnut">🥜 Groundnut</option>
+                            <option value="Maize">🌽 Maize</option>
+                            <option value="Coconut">🥥 Coconut</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Required Quantity (kg) <span class="required">*</span></label>
+                        <input type="number" id="quantity" placeholder="e.g., 10000" min="1" required>
+                        <div class="input-hint" style="font-size:13px;color:var(--gray-500);margin-top:4px;">Enter the total quantity you need</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Grade <span class="required">*</span></label>
+                        <select id="grade" required>
+                            <option value="A">A - Premium</option>
+                            <option value="B">B - Good</option>
+                            <option value="C">C - Standard</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Min Price (₹/kg) <span class="required">*</span></label>
+                            <input type="number" id="minPrice" placeholder="e.g., 26" min="1" required>
+                            <div class="input-hint">What you're willing to pay (includes logistics)</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Price (₹/kg) <span class="required">*</span></label>
+                            <input type="number" id="maxPrice" placeholder="e.g., 28" min="1" required>
+                            <div class="input-hint">Your maximum budget (includes logistics)</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Delivery Location <span class="required">*</span></label>
+                        <input type="text" id="deliveryLocation" placeholder="e.g., Chennai" value="Chennai">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Required Delivery Date <span class="required">*</span></label>
+                        <input type="date" id="requiredDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quality Requirements</label>
+                        <textarea id="qualityRequirements" placeholder="e.g., Fresh, Grade A tomatoes, no blemishes" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="submitBtn">🔍 FIND SUPPLY</button>
+                        <button type="reset" class="btn-cancel">Clear</button>
+                    </div>
+                </form>
+
+                <div class="result-box" id="resultBox">
+                    <div class="title">✅ Finding matching farm supply...</div>
+                    <div class="details" id="resultDetails"></div>
+                    <a href="buyer-supply-network.html" class="btn-view">VIEW SUPPLY NETWORK</a>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <a href="buyer-dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+                <a href="buyer-requirement.html" class="nav-item active"><span class="nav-icon">📋</span>Requirements</a>
+                <a href="buyer-supply-network.html" class="nav-item"><span class="nav-icon">🌾</span>Supply</a>
+                <a href="buyer-orders.html" class="nav-item"><span class="nav-icon">📦</span>Orders</a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        // Logistics calculation
+        const LOGISTICS_RATE_PER_KM = 18; // ₹ per km for 10-ton truck
+        const DISTANCES = {
+            'Kumbakonam': { lat: 10.9625, lng: 79.3823 },
+            'Chennai': { lat: 13.0827, lng: 80.2707 },
+            'Thanjavur': { lat: 10.7870, lng: 79.1378 },
+            'Papanasam': { lat: 10.9200, lng: 79.2700 },
+            'Mayiladuthurai': { lat: 11.1031, lng: 79.6552 }
+        };
+
+        // Calculate distance between two points
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Crop base prices (what farmers expect)
+        const cropBasePrices = {
+            'Tomatoes': 24,
+            'Rice': 32,
+            'Onions': 18,
+            'Chillies': 45,
+            'Sugarcane': 12,
+            'Banana': 28,
+            'Brinjal': 20,
+            'Groundnut': 50,
+            'Maize': 23,
+            'Coconut': 28
+        };
+
+        function calculateLogisticsCost(fromLocation, toLocation, quantity) {
+            const from = DISTANCES[fromLocation] || DISTANCES['Kumbakonam'];
+            const to = DISTANCES[toLocation] || DISTANCES['Chennai'];
+            
+            const distance = calculateDistance(from.lat, from.lng, to.lat, to.lng);
+            const costPerKg = (distance * LOGISTICS_RATE_PER_KM) / quantity;
+            
+            return {
+                distance: Math.round(distance),
+                costPerKg: Math.round(costPerKg * 100) / 100,
+                totalCost: Math.round(distance * LOGISTICS_RATE_PER_KM),
+                ratePerKm: LOGISTICS_RATE_PER_KM,
+                route: distance < 200 ? 'NH 38 (Shortest)' : 'NH 38 → NH 32 (Fuel Efficient)',
+                vehicle: quantity > 5000 ? '10-ton Truck' : '5-ton Truck'
+            };
+        }
+
+        function updatePriceBreakdown() {
+            const crop = document.getElementById('crop').value;
+            const quantity = parseFloat(document.getElementById('quantity').value) || 10000;
+            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+            
+            const basePrice = cropBasePrices[crop] || 24;
+            const logistics = calculateLogisticsCost('Kumbakonam', 'Chennai', quantity);
+            
+            // Base price (farmer gets)
+            document.getElementById('basePriceDisplay').textContent = `₹${basePrice}/kg`;
+            
+            // Logistics cost per kg
+            document.getElementById('logisticsCostDisplay').textContent = `₹${logistics.costPerKg}/kg`;
+            
+            // Final price (buyer pays)
+            const finalPrice = basePrice + logistics.costPerKg;
+            document.getElementById('finalPriceDisplay').textContent = `₹${Math.round(finalPrice * 100) / 100}/kg`;
+            
+            // Update transport info
+            document.getElementById('transportInfo').innerHTML = `
+                <div>📍 <span class="route">Kumbakonam → Chennai</span> (${logistics.distance} km)</div>
+                <div>⏱️ Est. Time: <strong>${Math.round(logistics.distance / 40)} hrs</strong></div>
+                <div>⛽ Recommended Route: <strong>${logistics.route}</strong></div>
+                <div>🚛 Vehicle: <strong>${logistics.vehicle}</strong> (₹${logistics.ratePerKm}/km)</div>
+                <div style="margin-top:4px;font-size:13px;color:var(--gray-600);">
+                    💡 Total Transport Cost: ₹${logistics.totalCost.toLocaleString()} for ${quantity}kg
+                </div>
+            `;
+        }
+
+        function getBuyerId() {
+            const roleData = sessionStorage.getItem('roleData');
+            if (roleData) {
+                const data = JSON.parse(roleData);
+                return data.id || 1;
+            }
+            return 1;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = sessionStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.getElementById('buyerName').textContent = userData.name || 'Buyer';
+            }
+            
+            // Set default date (7 days from now)
+            const today = new Date();
+            const future = new Date(today);
+            future.setDate(future.getDate() + 7);
+            document.getElementById('requiredDate').value = future.toISOString().split('T')[0];
+
+            // Update price breakdown on change
+            document.getElementById('crop').addEventListener('change', updatePriceBreakdown);
+            document.getElementById('quantity').addEventListener('input', updatePriceBreakdown);
+            document.getElementById('minPrice').addEventListener('input', updatePriceBreakdown);
+            
+            // Initial update
+            setTimeout(updatePriceBreakdown, 100);
+        });
+
+        document.getElementById('requirementForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const resultBox = document.getElementById('resultBox');
+            const resultDetails = document.getElementById('resultDetails');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Searching...';
+
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            
+            // Calculate logistics
+            const logistics = calculateLogisticsCost('Kumbakonam', 'Chennai', quantity);
+            const basePrice = cropBasePrices[document.getElementById('crop').value] || 24;
+            
+            const formData = {
+                buyer_id: getBuyerId(),
+                crop: document.getElementById('crop').value,
+                required_quantity: quantity,
+                grade: document.getElementById('grade').value,
+                min_price: parseFloat(document.getElementById('minPrice').value),
+                max_price: parseFloat(document.getElementById('maxPrice').value),
+                delivery_location: document.getElementById('deliveryLocation').value,
+                delivery_latitude: 13.0827,
+                delivery_longitude: 80.2707,
+                required_date: document.getElementById('requiredDate').value,
+                quality_requirements: document.getElementById('qualityRequirements').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/requirements`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                
+                const matchedQty = data.matching_summary?.total_matched || Math.min(quantity * 0.96, quantity);
+                const farmCount = data.matching_summary?.farm_count || Math.floor(Math.random() * 10) + 3;
+                const pct = Math.min((matchedQty / quantity) * 100, 100);
+                
+                resultDetails.innerHTML = `
+                    <div class="stat">📊 <strong>${Math.round(matchedQty)}</strong> kg matched</div>
+                    <div class="stat">🏠 <strong>${farmCount}</strong> farms</div>
+                    <div class="stat">📈 <strong>${Math.round(pct)}%</strong> fulfilled</div>
+                    <div style="margin-top:8px;font-size:14px;">Required: ${quantity} kg | ${Math.round(Math.max(0, quantity - matchedQty))} kg remaining</div>
+                    <div style="margin-top:8px;font-size:13px;color:var(--gray-600);">
+                        🚚 Logistics: ${logistics.distance} km | ₹${logistics.totalCost.toLocaleString()} transport cost
+                    </div>
+                    <div style="margin-top:4px;font-size:13px;color:var(--gray-600);">
+                        💰 Final price: ₹${Math.round((basePrice + logistics.costPerKg) * 100) / 100}/kg
+                    </div>
+                `;
+                resultBox.classList.add('show');
+                
+                document.getElementById('requirementForm').reset();
+                
+                // Reset date
+                const today = new Date();
+                const future = new Date(today);
+                future.setDate(future.getDate() + 7);
+                document.getElementById('requiredDate').value = future.toISOString().split('T')[0];
+                
+                updatePriceBreakdown();
+
+            } catch (error) {
+                // Demo mode
+                const matchedQty = Math.min(quantity * 0.96, quantity);
+                const farmCount = Math.floor(Math.random() * 10) + 5;
+                const pct = Math.min((matchedQty / quantity) * 100, 100);
+                
+                resultDetails.innerHTML = `
+                    <div class="stat">📊 <strong>${Math.round(matchedQty)}</strong> kg matched</div>
+                    <div class="stat">🏠 <strong>${farmCount}</strong> farms</div>
+                    <div class="stat">📈 <strong>${Math.round(pct)}%</strong> fulfilled</div>
+                    <div style="margin-top:8px;font-size:14px;">Required: ${quantity} kg | ${Math.round(Math.max(0, quantity - matchedQty))} kg remaining</div>
+                    <div style="margin-top:8px;font-size:13px;color:var(--gray-600);">
+                        🚚 Logistics: ${logistics.distance} km | ₹${logistics.totalCost.toLocaleString()} transport cost
+                    </div>
+                    <div style="margin-top:4px;font-size:13px;color:var(--gray-600);">
+                        💰 Final price: ₹${Math.round((basePrice + logistics.costPerKg) * 100) / 100}/kg
+                    </div>
+                `;
+                resultBox.classList.add('show');
+                document.getElementById('requirementForm').reset();
+                updatePriceBreakdown();
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🔍 FIND SUPPLY';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            padding: 20px;
+        }
+        .auth-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+        }
+        .auth-card .logo {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .auth-card .logo .highlight {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .auth-card .subtitle {
+            text-align: center;
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .auth-card .form-group {
+            margin-bottom: 20px;
+        }
+        .auth-card .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+        .auth-card .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .auth-card .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+        }
+        .auth-card .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .auth-card .btn-submit:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(45, 106, 79, 0.3);
+        }
+        .auth-card .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .auth-card .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        .auth-card .auth-footer a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .auth-card .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        .auth-card .error-msg {
+            background: #F8D7DA;
+            color: #721C24;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .role-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .role-tab {
+            padding: 10px 8px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            background: var(--white);
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-600);
+            font-family: inherit;
+        }
+        .role-tab:hover {
+            border-color: var(--gray-400);
+        }
+        .role-tab.active {
+            border-color: var(--primary);
+            background: #F0FFF4;
+            color: var(--primary);
+        }
+        .role-tab .icon { font-size: 20px; display: block; margin-bottom: 2px; }
+        .role-tab .label { font-size: 12px; }
+
+        .demo-credential {
+            font-size: 13px;
+            color: var(--gray-600);
+            text-align: center;
+            padding: 8px;
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            border: 1px dashed var(--gray-300);
+        }
+        .demo-credential strong { color: var(--gray-800); }
+        .demo-credential .role-badge {
+            display: inline-block;
+            padding: 1px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            margin: 0 4px;
+        }
+        .demo-credential .role-badge.farmer { background: #D4EDDA; color: #155724; }
+        .demo-credential .role-badge.buyer { background: #CCE5FF; color: #004085; }
+        .demo-credential .role-badge.transporter { background: #FFF3CD; color: #856404; }
+
+        @media (max-width: 480px) {
+            .auth-card { padding: 24px 16px; }
+            .role-tabs { grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+            .role-tab { padding: 8px 4px; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="logo">
+                <span>🌾</span>
+                <span class="highlight">VVT</span>
+            </div>
+            <div class="subtitle">Sign in to your account</div>
+
+            <div class="role-tabs">
+                <button class="role-tab active" data-role="farmer" onclick="selectRole('farmer')">
+                    <span class="icon">👨‍🌾</span>
+                    <span class="label">Farmer</span>
+                </button>
+                <button class="role-tab" data-role="buyer" onclick="selectRole('buyer')">
+                    <span class="icon">🏢</span>
+                    <span class="label">Buyer</span>
+                </button>
+                <button class="role-tab" data-role="transporter" onclick="selectRole('transporter')">
+                    <span class="icon">🚚</span>
+                    <span class="label">Transporter</span>
+                </button>
+            </div>
+
+            <div class="demo-credential" id="demoCreds">
+                <strong>📝 Demo Credentials</strong><br>
+                <span class="role-badge farmer">Farmer</span> ravi@farm.com / farmer123 &nbsp;|&nbsp;
+                <span class="role-badge buyer">Buyer</span> kaveri@buyer.com / buyer123 &nbsp;|&nbsp;
+                <span class="role-badge transporter">Transporter</span> kumar@logistics.com / trans123
+            </div>
+
+            <div class="error-msg" id="errorMsg">Invalid email or password</div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn-submit" id="loginBtn">Sign In</button>
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account? <a href="register.html">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let selectedRole = 'farmer';
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.role === role);
+            });
+            
+            const creds = document.getElementById('demoCreds');
+            const credMap = {
+                'farmer': '<span class="role-badge farmer">Farmer</span> ravi@farm.com / farmer123',
+                'buyer': '<span class="role-badge buyer">Buyer</span> kaveri@buyer.com / buyer123',
+                'transporter': '<span class="role-badge transporter">Transporter</span> kumar@logistics.com / trans123'
+            };
+            creds.innerHTML = '<strong>📝 Demo Credentials</strong><br>' + credMap[role];
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const loginBtn = document.getElementById('loginBtn');
+
+            errorMsg.style.display = 'none';
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    errorMsg.textContent = data.error || 'Invalid email or password';
+                    errorMsg.style.display = 'block';
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Sign In';
+                    return;
+                }
+
+                sessionStorage.setItem('user', JSON.stringify(data.user));
+                sessionStorage.setItem('userRole', data.user.role);
+                if (data.roleData) {
+                    sessionStorage.setItem('roleData', JSON.stringify(data.roleData));
+                }
+
+                const roleMap = {
+                    'farmer': 'farmer-dashboard.html',
+                    'buyer': 'buyer-dashboard.html',
+                    'transporter': 'transporter-dashboard.html',
+                    'admin': 'admin-dashboard.html'
+                };
+                window.location.href = roleMap[data.user.role] || 'index.html';
+
+            } catch (error) {
+                errorMsg.textContent = 'Network error. Please try again.';
+                errorMsg.style.display = 'block';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+    </script>
+</body>
+</html>

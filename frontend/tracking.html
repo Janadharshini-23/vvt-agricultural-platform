@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Tracking — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/logistics.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        #trackingMap { height: 450px; border-radius: 16px; border: 1px solid var(--gray-200); }
+        .tracking-controls { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; justify-content: center; }
+        .tracking-controls button { padding: 12px 28px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: var(--transition); font-family: inherit; font-size: 14px; }
+        .tracking-controls .btn-start { background: var(--success); color: white; }
+        .tracking-controls .btn-start:hover { background: #218838; }
+        .tracking-controls .btn-pause { background: var(--warning); color: white; }
+        .tracking-controls .btn-pause:hover { background: #d39e00; }
+        .tracking-controls .btn-reset { background: var(--gray-600); color: white; }
+        .tracking-controls .btn-reset:hover { background: var(--gray-700); }
+        .tracking-controls .btn-start:disabled, .tracking-controls .btn-pause:disabled { opacity: 0.5; cursor: not-allowed; }
+        .tracking-status { text-align: center; padding: 20px; background: var(--gray-50); border-radius: 12px; margin: 16px 0; }
+        .tracking-status .status-icon { font-size: 48px; }
+        .tracking-status .status-text { font-size: 20px; font-weight: 700; }
+        .tracking-status .status-detail { color: var(--gray-600); }
+        .route-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 16px 0; }
+        .route-info .info-card { background: var(--white); padding: 16px; border-radius: 8px; border: 1px solid var(--gray-200); text-align: center; }
+        .route-info .info-card .label { font-size: 14px; color: var(--gray-600); }
+        .route-info .info-card .value { font-size: 20px; font-weight: 700; }
+        .role-banner { padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-block; margin-bottom: 12px; }
+        .role-banner.farmer { background: #D4EDDA; color: #155724; }
+        .role-banner.buyer { background: #CCE5FF; color: #004085; }
+        .role-banner.transporter { background: #FFF3CD; color: #856404; }
+        .vehicle-info-card { background: var(--white); border-radius: 12px; padding: 16px; border: 1px solid var(--gray-200); margin: 12px 0; }
+        .vehicle-info-card .title { font-weight: 700; font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .vehicle-info-card .details { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        .vehicle-info-card .details .item { padding: 8px 12px; background: var(--gray-50); border-radius: 6px; }
+        .vehicle-info-card .details .item .label { font-size: 12px; color: var(--gray-600); }
+        .vehicle-info-card .details .item .value { font-weight: 600; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="dashboard-nav">
+            <div class="logo"><span class="logo-icon">🌾</span><span class="logo-text">VVT</span></div>
+            <div class="nav-actions">
+                <div class="user-badge"><span>🚚</span><span>Live Tracking</span></div>
+                <a href="#" id="backLink" class="btn-outline-sm" style="padding:6px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);text-decoration:none;color:var(--gray-600);font-size:14px;">← Back</a>
+            </div>
+        </nav>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header fade-in">
+                <div id="roleBanner" class="role-banner farmer">👨‍🌾 Viewing as Farmer</div>
+                <h1>🚚 Simulated Live Tracking</h1>
+                <p class="subtitle" id="trackingSubtitle">Tracking order #1 — 10,000 kg Tomatoes from Kumbakonam to Chennai</p>
+            </header>
+
+            <!-- Vehicle Info - Visible to ALL roles -->
+            <div class="vehicle-info-card">
+                <div class="title">🚛 Vehicle & Transporter Details</div>
+                <div class="details">
+                    <div class="item">
+                        <div class="label">Vehicle Number</div>
+                        <div class="value">TN 49 AB 1234</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Vehicle Type</div>
+                        <div class="value">10-ton Truck</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Transporter</div>
+                        <div class="value">Kumar Logistics</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Driver</div>
+                        <div class="value">Sathish</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Contact</div>
+                        <div class="value">+91 98765 43222</div>
+                    </div>
+                    <div class="item">
+                        <div class="label">Status</div>
+                        <div class="value" style="color:var(--success);">✅ Available</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="route-info" id="routeInfo">
+                <div class="info-card"><div class="label">Distance</div><div class="value" id="distance">320 km</div></div>
+                <div class="info-card"><div class="label">Est. Time</div><div class="value" id="estTime">8 hrs</div></div>
+                <div class="info-card"><div class="label">Farms</div><div class="value" id="farmCount">14</div></div>
+                <div class="info-card"><div class="label">Progress</div><div class="value" id="progressValue">0%</div></div>
+            </div>
+
+            <div id="trackingMap"></div>
+
+            <div class="tracking-controls">
+                <button class="btn-start" id="startBtn" onclick="startTracking()">▶ START SIMULATION</button>
+                <button class="btn-pause" id="pauseBtn" onclick="togglePause()" disabled>⏸ PAUSE</button>
+                <button class="btn-reset" onclick="resetTracking()">⟲ RESET</button>
+            </div>
+
+            <div class="tracking-status" id="trackingStatus">
+                <div class="status-icon">⏳</div>
+                <div class="status-text">Ready to Start</div>
+                <div class="status-detail">Click "START SIMULATION" to begin the journey</div>
+            </div>
+
+            <div style="margin-top:24px;padding:20px;background:var(--white);border-radius:12px;border:1px solid var(--gray-200);">
+                <h3 style="margin-bottom:12px;">⏰ Freshness Tracking</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;" id="freshnessTimeline">
+                    <div style="text-align:center;padding:8px;background:var(--gray-50);border-radius:8px;">
+                        <div style="font-size:12px;color:var(--gray-600);">Harvested</div>
+                        <div style="font-weight:700;font-size:14px;">8:00 AM</div>
+                    </div>
+                    <div style="text-align:center;padding:8px;background:var(--gray-50);border-radius:8px;">
+                        <div style="font-size:12px;color:var(--gray-600);">Pickup</div>
+                        <div style="font-weight:700;font-size:14px;">11:00 AM</div>
+                    </div>
+                    <div style="text-align:center;padding:8px;background:var(--gray-50);border-radius:8px;">
+                        <div style="font-size:12px;color:var(--gray-600);">Aggregation</div>
+                        <div style="font-weight:700;font-size:14px;">1:00 PM</div>
+                    </div>
+                    <div style="text-align:center;padding:8px;background:var(--gray-50);border-radius:8px;">
+                        <div style="font-size:12px;color:var(--gray-600);">Dispatch</div>
+                        <div style="font-weight:700;font-size:14px;">2:00 PM</div>
+                    </div>
+                    <div style="text-align:center;padding:8px;background:var(--gray-50);border-radius:8px;">
+                        <div style="font-size:12px;color:var(--gray-600);">Expected Arrival</div>
+                        <div style="font-weight:700;font-size:14px;">5:00 PM</div>
+                    </div>
+                    <div style="text-align:center;padding:8px;background:#D4EDDA;border-radius:8px;">
+                        <div style="font-size:12px;color:var(--gray-600);">Freshness Status</div>
+                        <div style="font-weight:700;font-size:14px;color:var(--success);">✅ GOOD</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        const LOGISTICS_ID = 1;
+
+        let map = null;
+        let truckMarker = null;
+        let routeLine = null;
+        let isRunning = false;
+        let isPaused = false;
+        let progress = 0;
+        let positionInterval = null;
+
+        // Get role from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const userRole = urlParams.get('role') || sessionStorage.getItem('userRole') || 'farmer';
+
+        // Set back link based on role
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleMap = {
+                'farmer': 'farmer-dashboard.html',
+                'buyer': 'buyer-dashboard.html',
+                'transporter': 'transporter-dashboard.html'
+            };
+            document.getElementById('backLink').href = roleMap[userRole] || 'index.html';
+            
+            // Update role banner
+            const banner = document.getElementById('roleBanner');
+            const roleNames = {
+                'farmer': '👨‍🌾 Viewing as Farmer — Track your produce delivery',
+                'buyer': '🏢 Viewing as Bulk Buyer — Track your order delivery',
+                'transporter': '🚚 Viewing as Transporter — Track your assigned route'
+            };
+            const roleClasses = {
+                'farmer': 'farmer',
+                'buyer': 'buyer',
+                'transporter': 'transporter'
+            };
+            banner.textContent = roleNames[userRole] || '👨‍🌾 Viewing as Farmer';
+            banner.className = 'role-banner ' + (roleClasses[userRole] || 'farmer');
+
+            // Update subtitle based on role
+            const subtitle = document.getElementById('trackingSubtitle');
+            if (userRole === 'farmer') {
+                subtitle.textContent = 'Tracking your produce delivery to Kaveri Fresh Foods • Vehicle: TN 49 AB 1234';
+            } else if (userRole === 'buyer') {
+                subtitle.textContent = 'Tracking your order #1 — 10,000 kg Tomatoes • Transporter: Kumar Logistics';
+            } else {
+                subtitle.textContent = 'Tracking order #1 — 10,000 kg Tomatoes from Kumbakonam to Chennai';
+            }
+
+            initMap();
+            document.getElementById('pauseBtn').disabled = true;
+        });
+
+        const waypoints = [
+            { lat: 10.9625, lng: 79.3823, label: 'Farm Cluster' },
+            { lat: 10.9200, lng: 79.2700, label: 'Farm 3' },
+            { lat: 10.8500, lng: 79.2000, label: 'Farm 4' },
+            { lat: 10.8000, lng: 79.1500, label: 'Farm 5' },
+            { lat: 10.7500, lng: 79.1000, label: 'Farm 6' },
+            { lat: 10.7000, lng: 79.0500, label: 'Farm 7' },
+            { lat: 10.6500, lng: 79.0000, label: 'Aggregation Hub' },
+            { lat: 11.0000, lng: 79.5000, label: 'En Route' },
+            { lat: 11.5000, lng: 79.8000, label: 'En Route' },
+            { lat: 12.0000, lng: 80.0000, label: 'En Route' },
+            { lat: 12.5000, lng: 80.1500, label: 'En Route' },
+            { lat: 13.0827, lng: 80.2707, label: 'Chennai (Buyer)' }
+        ];
+
+        function initMap() {
+            map = L.map('trackingMap').setView([11.0, 79.4], 8);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const routePoints = waypoints.map(w => [w.lat, w.lng]);
+            routeLine = L.polyline(routePoints, {
+                color: '#2D6A4F',
+                weight: 3,
+                opacity: 0.6,
+                dashArray: '10, 10'
+            }).addTo(map);
+
+            waypoints.forEach((w, i) => {
+                const color = i === 0 ? '#2D6A4F' : i === waypoints.length - 1 ? '#E76F51' : i === 6 ? '#1A3A5C' : '#6C757D';
+                L.circleMarker([w.lat, w.lng], {
+                    radius: i === 0 || i === waypoints.length - 1 || i === 6 ? 8 : 4,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
+                }).addTo(map).bindPopup(`<div style="font-weight:700;">${w.label}</div>`);
+            });
+
+            const truckIcon = L.divIcon({
+                html: '🚛',
+                className: 'truck-marker',
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+
+            truckMarker = L.marker([waypoints[0].lat, waypoints[0].lng], {
+                icon: truckIcon,
+                zIndexOffset: 1000
+            }).addTo(map);
+            truckMarker.bindPopup('🚛 Truck • 10,000 kg • TN 49 AB 1234');
+
+            map.fitBounds(routePoints, { padding: [40, 40] });
+            setTimeout(() => map.invalidateSize(), 300);
+        }
+
+        function startTracking() {
+            if (isRunning) return;
+            isRunning = true;
+            isPaused = false;
+            progress = 0;
+
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('pauseBtn').textContent = '⏸ PAUSE';
+            updateStatus('🚛', 'In Transit', 'Truck is moving from farms to destination');
+
+            let currentIndex = 0;
+            positionInterval = setInterval(() => {
+                if (isPaused) return;
+                progress += 2;
+                currentIndex = Math.min(Math.floor((progress / 100) * (waypoints.length - 1)), waypoints.length - 2);
+                const nextIndex = Math.min(currentIndex + 1, waypoints.length - 1);
+                const t = (progress % 2) / 2;
+                const from = waypoints[currentIndex];
+                const to = waypoints[nextIndex];
+                const lat = from.lat + (to.lat - from.lat) * t;
+                const lng = from.lng + (to.lng - from.lng) * t;
+
+                truckMarker.setLatLng([lat, lng]);
+                map.panTo([lat, lng], { animate: true, duration: 0.5 });
+                document.getElementById('progressValue').textContent = Math.round(progress) + '%';
+                updateFreshness(progress);
+
+                if (progress >= 100) {
+                    completeTracking();
+                }
+            }, 500);
+        }
+
+        function togglePause() {
+            if (!isRunning) return;
+            isPaused = !isPaused;
+            document.getElementById('pauseBtn').textContent = isPaused ? '▶ RESUME' : '⏸ PAUSE';
+            updateStatus(
+                isPaused ? '⏸' : '🚛',
+                isPaused ? 'Paused' : 'In Transit',
+                isPaused ? 'Simulation paused' : 'Truck is moving'
+            );
+        }
+
+        function resetTracking() {
+            if (positionInterval) {
+                clearInterval(positionInterval);
+                positionInterval = null;
+            }
+            isRunning = false;
+            isPaused = false;
+            progress = 0;
+            truckMarker.setLatLng([waypoints[0].lat, waypoints[0].lng]);
+            map.panTo([waypoints[0].lat, waypoints[0].lng]);
+            document.getElementById('progressValue').textContent = '0%';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('pauseBtn').textContent = '⏸ PAUSE';
+            updateStatus('⏳', 'Ready to Start', 'Click "START SIMULATION" to begin the journey');
+            resetFreshness();
+        }
+
+        function completeTracking() {
+            if (positionInterval) {
+                clearInterval(positionInterval);
+                positionInterval = null;
+            }
+            isRunning = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            truckMarker.setLatLng([waypoints[waypoints.length - 1].lat, waypoints[waypoints.length - 1].lng]);
+            document.getElementById('progressValue').textContent = '100%';
+            updateStatus('✅', 'Delivered!', '✓ 10,000 kg delivered successfully');
+            document.querySelector('#freshnessTimeline div:last-child div:last-child').textContent = '✅ EXCELLENT';
+            document.querySelector('#freshnessTimeline div:last-child').style.background = '#D4EDDA';
+            alert('✅ Delivery completed! 10,000 kg delivered successfully.');
+        }
+
+        function updateStatus(icon, text, detail) {
+            document.querySelector('.tracking-status .status-icon').textContent = icon;
+            document.querySelector('.tracking-status .status-text').textContent = text;
+            document.querySelector('.tracking-status .status-detail').textContent = detail;
+        }
+
+        function updateFreshness(progress) {
+            const statusEl = document.querySelector('#freshnessTimeline div:last-child div:last-child');
+            const bgEl = document.querySelector('#freshnessTimeline div:last-child');
+            if (progress < 30) {
+                statusEl.textContent = '✅ GOOD';
+                statusEl.style.color = 'var(--success)';
+                bgEl.style.background = '#D4EDDA';
+            } else if (progress < 60) {
+                statusEl.textContent = '⚡ FRESH';
+                statusEl.style.color = 'var(--warning)';
+                bgEl.style.background = '#FFF3CD';
+            } else if (progress < 85) {
+                statusEl.textContent = '⚠️ HANDLE WITH CARE';
+                statusEl.style.color = '#856404';
+                bgEl.style.background = '#FFF3CD';
+            } else {
+                statusEl.textContent = '✅ GOOD';
+                statusEl.style.color = 'var(--success)';
+                bgEl.style.background = '#D4EDDA';
+            }
+        }
+
+        function resetFreshness() {
+            const statusEl = document.querySelector('#freshnessTimeline div:last-child div:last-child');
+            const bgEl = document.querySelector('#freshnessTimeline div:last-child');
+            statusEl.textContent = '✅ GOOD';
+            statusEl.style.color = 'var(--success)';
+            bgEl.style.background = '#D4EDDA';
+        }
+    </script>
+</body>
+</html>

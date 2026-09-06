@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .order-timeline { display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:16px;background:var(--gray-50);border-radius:8px; }
+        .order-timeline .step { display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 12px;border-radius:50px;background:var(--gray-200);color:var(--gray-600); }
+        .order-timeline .step.completed { background:#D4EDDA;color:#155724; }
+        .order-timeline .step.active { background:#CCE5FF;color:#004085; }
+        .order-timeline .step .icon { font-size:16px; }
+        .order-card { background:var(--white);border-radius:var(--radius);padding:24px;border:1px solid var(--gray-200);margin-bottom:16px; }
+        .order-card .header { display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px; }
+        .order-card .order-id { font-weight:600;color:var(--gray-600);font-size:14px; }
+        .order-card .crop-name { font-size:20px;font-weight:700; }
+        .order-card .details { display:flex;flex-wrap:wrap;gap:12px 24px;margin:8px 0;font-size:14px;color:var(--gray-600); }
+        .order-card .details strong { color:var(--gray-800); }
+        .payment-info { padding:12px 16px;background:var(--gray-50);border-radius:8px;margin:8px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px; }
+        .payment-info .amount { font-size:20px;font-weight:800;color:var(--primary); }
+        .payment-info .status { font-weight:600; }
+        .payment-info .status.secured { color:var(--success); }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="dashboard-nav">
+            <div class="logo"><span class="logo-icon">🌾</span><span class="logo-text">VVT</span></div>
+            <div class="nav-actions">
+                <div class="user-badge"><span>👨‍🌾</span><span>Ravi Kumar</span><span class="verified">✓</span></div>
+                <a href="farmer-dashboard.html" class="btn-outline-sm" style="padding:6px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);text-decoration:none;color:var(--gray-600);font-size:14px;">← Back</a>
+            </div>
+        </nav>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header fade-in">
+                <h1>📦 My Orders</h1>
+                <p class="subtitle">Track your orders from confirmation to delivery</p>
+            </header>
+
+            <!-- Active Order -->
+            <div class="order-card fade-in">
+                <div class="header">
+                    <div>
+                        <div class="crop-name">🍅 Tomatoes</div>
+                        <div class="order-id">Order #VVT-2026-001</div>
+                    </div>
+                    <span class="status-badge in-transit">IN TRANSIT</span>
+                </div>
+
+                <div class="details">
+                    <span><strong>500</strong> kg</span>
+                    <span>₹<strong>27</strong>/kg</span>
+                    <span>Buyer: <strong>Kaveri Fresh Foods</strong></span>
+                    <span>📍 <strong>Chennai</strong></span>
+                    <span>Pickup: <strong>Tomorrow 5:30 AM</strong></span>
+                </div>
+
+                <!-- Order Timeline -->
+                <div class="order-timeline">
+                    <span class="step completed"><span class="icon">✓</span> Price Discovered</span>
+                    <span class="step completed"><span class="icon">✓</span> Buyer Matched</span>
+                    <span class="step completed"><span class="icon">✓</span> Supply Confirmed</span>
+                    <span class="step active"><span class="icon">⏳</span> Aggregating</span>
+                    <span class="step"><span class="icon">⏳</span> Ready for Dispatch</span>
+                    <span class="step"><span class="icon">⏳</span> In Transit</span>
+                    <span class="step"><span class="icon">⏳</span> Delivered</span>
+                </div>
+
+                <!-- Payment -->
+                <div class="payment-info">
+                    <div>
+                        <div style="font-size:14px;color:var(--gray-600);">Order Value</div>
+                        <div class="amount">₹13,500</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:14px;color:var(--gray-600);">Payment Status</div>
+                        <div class="status secured">✓ Payment Secured (Escrow)</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:12px;">
+                    <a href="tracking.html" class="btn-sm btn-primary-sm" style="padding:10px 24px;text-decoration:none;display:inline-block;background:var(--primary);color:white;border-radius:8px;font-weight:600;">🔍 TRACK DELIVERY</a>
+                </div>
+            </div>
+
+            <!-- Completed Order -->
+            <div class="order-card fade-in">
+                <div class="header">
+                    <div>
+                        <div class="crop-name">🌾 Rice</div>
+                        <div class="order-id">Order #VVT-2026-002</div>
+                    </div>
+                    <span class="status-badge delivered">DELIVERED</span>
+                </div>
+
+                <div class="details">
+                    <span><strong>200</strong> kg</span>
+                    <span>₹<strong>32</strong>/kg</span>
+                    <span>Buyer: <strong>Chennai Retail Mart</strong></span>
+                    <span>📍 <strong>Chennai</strong></span>
+                </div>
+
+                <div class="order-timeline">
+                    <span class="step completed"><span class="icon">✓</span> Price Discovered</span>
+                    <span class="step completed"><span class="icon">✓</span> Buyer Matched</span>
+                    <span class="step completed"><span class="icon">✓</span> Supply Confirmed</span>
+                    <span class="step completed"><span class="icon">✓</span> Aggregating</span>
+                    <span class="step completed"><span class="icon">✓</span> Ready for Dispatch</span>
+                    <span class="step completed"><span class="icon">✓</span> In Transit</span>
+                    <span class="step completed"><span class="icon">✅</span> Delivered</span>
+                </div>
+
+                <div class="payment-info">
+                    <div>
+                        <div style="font-size:14px;color:var(--gray-600);">Order Value</div>
+                        <div class="amount">₹6,400</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:14px;color:var(--gray-600);">Payment Status</div>
+                        <div class="status secured">✅ Payment Released</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <a href="farmer-dashboard.html" class="nav-item"><span class="nav-icon">🏠</span>Home</a>
+                <a href="farmer-price.html" class="nav-item"><span class="nav-icon">📊</span>Market</a>
+                <a href="farmer-sell.html" class="nav-item"><span class="nav-icon">🌱</span>Sell</a>
+                <a href="farmer-orders.html" class="nav-item active"><span class="nav-icon">📦</span>Orders</a>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>

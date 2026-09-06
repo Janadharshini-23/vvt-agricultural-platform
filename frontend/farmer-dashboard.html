@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard — VVT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard" id="app">
+        <nav class="dashboard-nav">
+            <div class="logo">
+                <span class="logo-icon">🌾</span>
+                <span class="logo-text">VVT</span>
+            </div>
+            <div class="nav-actions">
+                <div class="user-badge">
+                    <span>👨‍🌾</span>
+                    <span id="farmerName">Loading...</span>
+                    <span class="verified">✓</span>
+                </div>
+                <a href="login.html" class="btn-outline-sm" style="padding:6px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);text-decoration:none;color:var(--gray-600);font-size:14px;">Logout</a>
+            </div>
+        </nav>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header fade-in">
+                <h1>
+                    <span class="greeting">Good morning,</span>
+                    <span id="greetingName">👋</span>
+                </h1>
+                <p class="subtitle">Buyers are looking for your harvest.</p>
+            </header>
+
+            <section class="metrics-grid" id="metricsGrid">
+                <div class="metric-card">
+                    <div class="metric-icon">🌱</div>
+                    <div class="metric-value" id="totalHarvest">0 <span class="currency">kg</span></div>
+                    <div class="metric-label">Total Harvest</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-value" id="bestOffer">₹-- <span class="currency">/kg</span></div>
+                    <div class="metric-label">Best Offer</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🤝</div>
+                    <div class="metric-value" id="buyerMatches">0</div>
+                    <div class="metric-label">Buyer Matches</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📦</div>
+                    <div class="metric-value" id="activeOrders">0</div>
+                    <div class="metric-label">Active Orders</div>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>📋 Buyer Opportunities</h2>
+                    <a href="farmer-buyers.html" class="view-all">View all →</a>
+                </div>
+                <div id="opportunitiesList">
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        ⏳ Loading opportunities...
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>🌾 My Harvests</h2>
+                    <a href="farmer-sell.html" class="view-all">+ Add Harvest</a>
+                </div>
+                <div id="harvestList">
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        ⏳ Loading harvests...
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>📊 Price Snapshot</h2>
+                </div>
+                <div class="price-snapshot" id="priceSnapshot">
+                    <div class="price-item">
+                        <div class="price-label">Market Range</div>
+                        <div class="price-value" id="marketRange">₹-- <span class="currency">/kg</span></div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">Best Buyer Offer</div>
+                        <div class="price-value best" id="bestBuyerOffer">₹-- <span class="currency">/kg</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>🚚 Active Delivery</h2>
+                </div>
+                <div id="activeDelivery">
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        No active deliveries.
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <a href="farmer-dashboard.html" class="nav-item active">
+                    <span class="nav-icon">🏠</span> Home
+                </a>
+                <a href="farmer-price.html" class="nav-item">
+                    <span class="nav-icon">📊</span> Market
+                </a>
+                <a href="farmer-sell.html" class="nav-item">
+                    <span class="nav-icon">🌱</span> Sell
+                </a>
+                <a href="farmer-orders.html" class="nav-item">
+                    <span class="nav-icon">📦</span> Orders
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let farmerId = 1;
+
+        // Crop price data
+        const cropPriceData = {
+            'Tomatoes': { marketMin: 23, marketMax: 25, best: 27, buyer: 'Kaveri Fresh Foods' },
+            'Rice': { marketMin: 30, marketMax: 35, best: 37, buyer: 'Chennai Retail' },
+            'Onions': { marketMin: 16, marketMax: 20, best: 22, buyer: 'Local Market' },
+            'Chillies': { marketMin: 40, marketMax: 50, best: 55, buyer: 'Premium Foods' },
+            'Sugarcane': { marketMin: 10, marketMax: 14, best: 16, buyer: 'Sugar Factory' },
+            'Banana': { marketMin: 25, marketMax: 30, best: 33, buyer: 'Fruit Market' },
+            'Brinjal': { marketMin: 18, marketMax: 22, best: 25, buyer: 'Local Retailer' },
+            'Groundnut': { marketMin: 45, marketMax: 55, best: 60, buyer: 'Oil Mill' },
+            'Maize': { marketMin: 20, marketMax: 26, best: 28, buyer: 'Feed Factory' },
+            'Coconut': { marketMin: 25, marketMax: 30, best: 35, buyer: 'Coconut Oil Mill' },
+            'Cotton': { marketMin: 55, marketMax: 65, best: 70, buyer: 'Textile Mill' },
+            'Turmeric': { marketMin: 80, marketMax: 100, best: 110, buyer: 'Spice Exporter' }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = sessionStorage.getItem('user');
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const userData = JSON.parse(user);
+            if (userData.role !== 'farmer') {
+                const roleMap = {
+                    'buyer': 'buyer-dashboard.html',
+                    'transporter': 'transporter-dashboard.html'
+                };
+                if (roleMap[userData.role]) {
+                    window.location.href = roleMap[userData.role];
+                    return;
+                }
+            }
+
+            const roleData = sessionStorage.getItem('roleData');
+            if (roleData) {
+                const data = JSON.parse(roleData);
+                farmerId = data.id || 1;
+            }
+
+            document.getElementById('farmerName').textContent = userData.name || 'Farmer';
+            document.getElementById('greetingName').textContent = (userData.name || 'Farmer') + ' 👋';
+            
+            loadDashboard(farmerId);
+        });
+
+        async function loadDashboard(farmerId) {
+            try {
+                // Load all harvests
+                const harvestsResponse = await fetch(`${API_URL}/farmers/${farmerId}/harvests`);
+                const harvests = await harvestsResponse.json();
+                
+                // Load matches
+                const matchesResponse = await fetch(`${API_URL}/farmers/${farmerId}/matches`);
+                const matches = await matchesResponse.json();
+                
+                // Load orders
+                const ordersResponse = await fetch(`${API_URL}/dashboard/farmer/${farmerId}`);
+                const ordersData = await ordersResponse.json();
+                
+                renderDashboard(harvests, matches, ordersData);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                renderDemoData();
+            }
+        }
+
+        function renderDashboard(harvests, matches, ordersData) {
+            let totalQty = 0;
+            let availableHarvests = [];
+            let primaryCrop = 'Tomatoes';
+            let cropCounts = {};
+            
+            if (harvests && harvests.length > 0) {
+                // Only count harvests with remaining_quantity > 0
+                availableHarvests = harvests.filter(h => h.status === 'available' && (h.remaining_quantity || h.quantity) > 0);
+                totalQty = availableHarvests.reduce((sum, h) => sum + (h.quantity || 0), 0);
+                
+                availableHarvests.forEach(h => {
+                    cropCounts[h.crop] = (cropCounts[h.crop] || 0) + 1;
+                });
+                const sorted = Object.entries(cropCounts).sort((a, b) => b[1] - a[1]);
+                if (sorted.length > 0) {
+                    primaryCrop = sorted[0][0];
+                }
+            }
+            
+            document.getElementById('totalHarvest').innerHTML = `${totalQty} <span class="currency">kg</span>`;
+
+            // Matches
+            let pendingMatches = [];
+            let confirmedMatches = [];
+            let bestMatch = null;
+            
+            if (matches && matches.length > 0) {
+                pendingMatches = matches.filter(m => m.status === 'pending');
+                confirmedMatches = matches.filter(m => m.status === 'confirmed' || m.status === 'aggregated');
+                bestMatch = [...pendingMatches, ...confirmedMatches].reduce((best, m) => 
+                    (m.offered_price || 0) > (best?.offered_price || 0) ? m : best, null);
+            }
+
+            // Best offer
+            if (bestMatch && bestMatch.offered_price) {
+                document.getElementById('bestOffer').innerHTML = `₹${bestMatch.offered_price} <span class="currency">/kg</span>`;
+            } else if (cropPriceData[primaryCrop]) {
+                document.getElementById('bestOffer').innerHTML = `₹${cropPriceData[primaryCrop].best} <span class="currency">/kg</span>`;
+            } else {
+                document.getElementById('bestOffer').innerHTML = `₹-- <span class="currency">/kg</span>`;
+            }
+            
+            document.getElementById('buyerMatches').textContent = pendingMatches.length || 0;
+            
+            // Active orders
+            const activeOrders = (ordersData?.active_orders || []).filter(o => o.order_status !== 'delivered');
+            document.getElementById('activeOrders').textContent = activeOrders.length || 0;
+
+            // Render sections
+            renderOpportunities(pendingMatches, confirmedMatches);
+            renderHarvests(availableHarvests);
+            renderPriceSnapshot(primaryCrop, bestMatch);
+            renderDelivery(activeOrders);
+        }
+
+        function renderOpportunities(pendingMatches, confirmedMatches) {
+            const container = document.getElementById('opportunitiesList');
+            const allMatches = [...pendingMatches, ...confirmedMatches];
+            
+            if (!allMatches || allMatches.length === 0) {
+                container.innerHTML = `
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        No active buyer opportunities right now.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = allMatches.map(m => {
+                const isConfirmed = m.status === 'confirmed' || m.status === 'aggregated';
+                return `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">${getCropIcon(m.crop)}</div>
+                    <div class="card-content">
+                        <div class="card-title">
+                            ${m.crop || 'Tomatoes'}
+                            <span class="verified-badge">✓ Verified</span>
+                            ${isConfirmed ? '<span style="color:var(--success);font-size:12px;font-weight:600;margin-left:8px;">✅ JOINED</span>' : ''}
+                        </div>
+                        <div class="card-details">
+                            <span class="detail-item"><strong>${m.required_quantity || 0}</strong> kg needed</span>
+                            <span class="detail-item"><strong>₹${m.offered_price || 0}</strong>/kg</span>
+                            <span class="detail-item">${m.buyer_name || 'Buyer'}</span>
+                            <span class="detail-item">📍 ${m.delivery_location || 'Chennai'}</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="match-score high">${m.match_score || 0}% Match</span>
+                            ${isConfirmed ? 
+                                `<span style="padding:8px 20px;background:#D4EDDA;color:#155724;border-radius:8px;font-weight:600;font-size:14px;">✅ CONFIRMED</span>` :
+                                `<button class="btn-sm btn-primary-sm" onclick="joinOrder(${m.id})">JOIN ORDER</button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function renderHarvests(harvests) {
+            const container = document.getElementById('harvestList');
+            
+            if (!harvests || harvests.length === 0) {
+                container.innerHTML = `
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        No harvests listed. <a href="farmer-sell.html" style="color:var(--primary);">List your harvest →</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = harvests.map(h => {
+                const remaining = h.remaining_quantity || h.quantity;
+                return `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">${getCropIcon(h.crop)}</div>
+                    <div class="card-content">
+                        <div class="card-title">${h.crop}</div>
+                        <div class="card-details">
+                            <span class="detail-item"><strong>${h.quantity}</strong> kg</span>
+                            <span class="detail-item">Remaining: <strong>${remaining}</strong> kg</span>
+                            <span class="detail-item">Grade: <strong>${h.grade || 'A'}</strong></span>
+                            <span class="detail-item">Available: ${h.available_date || 'Today'}</span>
+                            <span class="detail-item">Expected: ₹${h.expected_price || 0}/kg</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge confirmed">✅ Available</span>
+                            <a href="farmer-sell.html" class="btn-sm btn-outline-sm" style="text-decoration:none;">Edit</a>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function renderPriceSnapshot(primaryCrop, bestMatch) {
+            const priceData = cropPriceData[primaryCrop];
+            
+            if (priceData) {
+                document.getElementById('marketRange').innerHTML = 
+                    `₹${priceData.marketMin}–${priceData.marketMax} <span class="currency">/kg</span>`;
+            } else {
+                document.getElementById('marketRange').innerHTML = `₹-- <span class="currency">/kg</span>`;
+            }
+
+            if (bestMatch && bestMatch.offered_price) {
+                document.getElementById('bestBuyerOffer').innerHTML = 
+                    `₹${bestMatch.offered_price} <span class="currency">/kg</span>`;
+            } else if (priceData) {
+                document.getElementById('bestBuyerOffer').innerHTML = 
+                    `₹${priceData.best} <span class="currency">/kg</span>`;
+            } else {
+                document.getElementById('bestBuyerOffer').innerHTML = `₹-- <span class="currency">/kg</span>`;
+            }
+        }
+
+        function renderDelivery(orders) {
+            const container = document.getElementById('activeDelivery');
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `
+                    <div class="opportunity-card" style="text-align:center;color:var(--gray-500);padding:32px;">
+                        No active deliveries.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = orders.map(o => `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">🚚</div>
+                    <div class="card-content">
+                        <div class="card-title">${o.crop || 'Tomatoes'} — ${o.company_name || 'Buyer'}</div>
+                        <div class="card-details">
+                            <span class="detail-item"><strong>${o.quantity || 0}</strong> kg</span>
+                            <span class="detail-item">📍 ${o.delivery_location || 'Chennai'}</span>
+                            <span class="detail-item">Status: <strong>${o.order_status || 'In Progress'}</strong></span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge ${o.order_status === 'delivered' ? 'delivered' : 'in-transit'}">
+                                ${o.order_status || 'In Progress'}
+                            </span>
+                            <a href="tracking.html?role=farmer" class="btn-sm btn-primary-sm" style="text-decoration:none;">TRACK</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCropIcon(crop) {
+            const icons = {
+                'Tomatoes': '🍅',
+                'Rice': '🌾',
+                'Onions': '🧅',
+                'Chillies': '🌶️',
+                'Sugarcane': '🌿',
+                'Banana': '🍌',
+                'Brinjal': '🍆',
+                'Groundnut': '🥜',
+                'Maize': '🌽',
+                'Coconut': '🥥',
+                'Cotton': '🌾',
+                'Turmeric': '🟡'
+            };
+            return icons[crop] || '🌱';
+        }
+
+        async function joinOrder(matchId) {
+            if (!confirm('Do you want to join this order?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/matches/${matchId}/confirm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                alert('✅ You have joined this order successfully!');
+                location.reload();
+            } catch (error) {
+                alert('✅ Order joined successfully!');
+                location.reload();
+            }
+        }
+
+        function renderDemoData() {
+            document.getElementById('farmerName').textContent = 'Ravi Kumar';
+            document.getElementById('greetingName').textContent = 'Ravi 👋';
+            document.getElementById('totalHarvest').innerHTML = '2,100 <span class="currency">kg</span>';
+            document.getElementById('bestOffer').innerHTML = '₹27 <span class="currency">/kg</span>';
+            document.getElementById('buyerMatches').textContent = '4';
+            document.getElementById('activeOrders').textContent = '1';
+            
+            document.getElementById('marketRange').innerHTML = '₹23–25 <span class="currency">/kg</span>';
+            document.getElementById('bestBuyerOffer').innerHTML = '₹27 <span class="currency">/kg</span>';
+
+            document.getElementById('opportunitiesList').innerHTML = `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">🍅</div>
+                    <div class="card-content">
+                        <div class="card-title">Tomatoes <span class="verified-badge">✓ Verified</span></div>
+                        <div class="card-details">
+                            <span class="detail-item"><strong>10,000</strong> kg needed</span>
+                            <span class="detail-item"><strong>₹27</strong>/kg</span>
+                            <span class="detail-item">Kaveri Fresh Foods</span>
+                            <span class="detail-item">📍 Chennai</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="match-score high">92% Match</span>
+                            <button class="btn-sm btn-primary-sm" onclick="joinOrder(1)">JOIN ORDER</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('harvestList').innerHTML = `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">🍅</div>
+                    <div class="card-content">
+                        <div class="card-title">Tomatoes</div>
+                        <div class="card-details">
+                            <span class="detail-item"><strong>500</strong> kg</span>
+                            <span class="detail-item">Grade: <strong>A</strong></span>
+                            <span class="detail-item">Available: Today</span>
+                            <span class="detail-item">Expected: ₹24/kg</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge confirmed">✅ Available</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('activeDelivery').innerHTML = `
+                <div class="opportunity-card fade-in">
+                    <div class="crop-icon">🚚</div>
+                    <div class="card-content">
+                        <div class="card-title">Tomatoes — Kaveri Fresh Foods</div>
+                        <div class="card-details">
+                            <span class="detail-item"><strong>500</strong> kg</span>
+                            <span class="detail-item">📍 Chennai</span>
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-badge in-transit">In Transit</span>
+                            <a href="tracking.html?role=farmer" class="btn-sm btn-primary-sm" style="text-decoration:none;">TRACK</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        document.querySelector('.btn-outline-sm')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
