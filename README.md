@@ -1,4 +1,4 @@
-# Create README.md
+
 cat > README.md << 'EOF'
 # 🌾 VVT — Vivasaaya Vaniga Thalam
 
